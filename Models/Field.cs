@@ -36,7 +36,7 @@ namespace Models {
             }
         }
 
-        public IEnumerable<Cell> GetCellsAround(Cell target) {
+        public IEnumerable<Cell> GetNeighbors(Cell target) {
             var top = Math.Max(0, target.Row - 1);
             var bottom = Math.Min(Rows - 1, target.Row + 1);
             var left = Math.Max(0, target.Column - 1);

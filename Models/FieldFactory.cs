@@ -35,7 +35,7 @@ namespace Models {
                     continue;
                 }
 
-                var neighbors = field.GetCellsAround(cell).ToList();
+                var neighbors = field.GetNeighbors(cell).ToList();
                 cell.MineAroundCount = (byte) neighbors.Sum(e => e.MineCount);
             }
         }

@@ -42,14 +42,15 @@
     <Compile Include="CellState.cs" />
     <Compile Include="Events\CellStateChangedEventHandler.cs" />
     <Compile Include="Events\CellStateChangedEventHandlerArgs.cs" />
-    <Compile Include="Events\FieldFeneratedEventHandler.cs" />
+    <Compile Include="Events\GameFinishedEventHandler.cs" />
+    <Compile Include="Events\GameFinishedEventHandlerArgs.cs" />
     <Compile Include="Field.cs" />
     <Compile Include="FieldFactory.cs" />
+    <Compile Include="GameManager.cs" />
     <Compile Include="IGameManager.cs" />
     <Compile Include="IMiningAlgorithm.cs" />
     <Compile Include="PlaySettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ReadOnlyField.cs" />
     <Compile Include="SimpleMiningAlgorithm.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Media;
 using Models;
 
@@ -89,7 +90,7 @@ namespace WpfApplication {
             for (byte row = 0; row < Rows; row++) {
                 for (byte col = 0; col < Columns; col++) {
                     var btn = new Button {
-                        Content = $"{field[row * Columns + col].DisplayString}"
+                        DataContext = $"{row};{col}"
                     };
                     _buttons[row, col] = btn;
                     AddVisualChild(btn);

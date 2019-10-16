@@ -19,8 +19,6 @@ namespace Models {
                 }
             };
 
-        private CellState _cellState;
-
         public Cell(byte row, byte column) {
             Row = row;
             Column = column;
@@ -33,16 +31,7 @@ namespace Models {
         public byte Row { get; }
         public byte Column { get; }
 
-        public CellState State {
-            get => _cellState;
-            set {
-                if (!CanChangeState(value)) {
-                    return;
-                }
-
-                _cellState = value;
-            }
-        }
+        public CellState State { get; private set; }
 
         public byte MineAroundCount { get; set; }
         public string DisplayString => IsMineHere ? "M" : MineAroundCount.ToString();
@@ -61,6 +50,15 @@ namespace Models {
             return $"[{Row},{Column}] - {DisplayString}";
         }
 
+        public bool TryChangeState(CellState newState, out CellState oldState) {
+            oldState = State;
+            if (!CanChangeState(newState)) {
+                return false;
+            }
+
+            State = newState;
+            return true;
+        }
 
         /// <summary>
         ///     Is it possible to switch to a new state
@@ -69,5 +67,31 @@ namespace Models {
         protected virtual bool CanChangeState(CellState newState) {
             return AllowedСonversions[State].Contains(newState);
         }
+
+        #region Equals
+
+        protected bool Equals(Cell other) {
+            return Row == other.Row && Column == other.Column;
+        }
+
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) {
+                return false;
+            }
+
+            if (ReferenceEquals(this, obj)) {
+                return true;
+            }
+
+            return obj.GetType() == GetType() && Equals((Cell) obj);
+        }
+
+        public override int GetHashCode() {
+            unchecked {
+                return (Row.GetHashCode() * 397) ^ Column.GetHashCode();
+            }
+        }
+
+        #endregion
     }
 }
