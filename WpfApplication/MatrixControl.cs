@@ -1,6 +1,7 @@
+using System;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Media;
 using Models;
 
@@ -28,9 +29,56 @@ namespace WpfApplication {
                     FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange,
                     OnColumnsChanged));
 
+        private readonly IGameManager _gameManager;
+
         private Button[,] _buttons;
 
         public MatrixControl() {
+            _gameManager = new GameManager(new FieldFactory(new SimpleMiningAlgorithm()));
+            _gameManager.OnGameFinished += (sender, args) => {
+                Debug.WriteLine($"GameFinished Fired - {args.IsVictory}");
+                MessageBox.Show(Application.Current.MainWindow, args.IsVictory ? "Game Victory!" : "You loser!");
+            };
+            _gameManager.OnCellStateChanged += (sender, args) => {
+                Debug.WriteLine($"OnCellStateChanged Fired - {args}");
+                var btn = _buttons[args.Row, args.Column];
+                string content = null;
+                Brush newBrush = null;
+                switch (args.NewState) {
+                    case CellState.Closed:
+                        content = "";
+                        break;
+                    case CellState.Opened:
+                        content = args.DisplayString;
+                        if (content == "M") {
+                            newBrush = Brushes.Black;
+                            break;
+                        }
+                        
+                        var val = byte.Parse(content);
+                        if (val > 0) {
+                            newBrush = Brushes.Firebrick;
+                            break;
+                        }
+
+                        newBrush = Brushes.Aquamarine;
+                        break;
+                    case CellState.MineHere:
+                        content = "!";
+                        break;
+                    case CellState.Undefined:
+                        content = "?";
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+
+                if (newBrush != null) {
+                    btn.Background = newBrush;
+                }
+                
+                btn.Content = content;
+            };
             CreateField();
         }
 
@@ -78,19 +126,27 @@ namespace WpfApplication {
                 return;
             }
 
-            var factory = new FieldFactory(new SimpleMiningAlgorithm());
-            var field = factory.Create(new PlaySettings {
+            var mineCount = (int) (Columns * Rows * 0.15);
+            Application.Current.MainWindow.Title = $"Количество мин - {mineCount}";
+            _gameManager.StartGame(new PlaySettings {
                 Columns = Columns,
                 Rows = Rows,
-                MineCount = (int) (Columns * Rows * 0.45)
+                MineCount = mineCount
             });
-
 
             _buttons = new Button[Rows, Columns];
             for (byte row = 0; row < Rows; row++) {
                 for (byte col = 0; col < Columns; col++) {
                     var btn = new Button {
                         DataContext = $"{row};{col}"
+                    };
+
+                    btn.PreviewMouseDown += (sender, args) => {
+                        Debug.WriteLine("MouseLeftButtonDown event fired");
+                        var context = (string) (sender as Button).DataContext;
+                        var r = byte.Parse(context.Split(';')[0]);
+                        var c = byte.Parse(context.Split(';')[1]);
+                        _gameManager.ChangeState(r, c, CellState.Opened);
                     };
                     _buttons[row, col] = btn;
                     AddVisualChild(btn);

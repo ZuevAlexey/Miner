@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Models.Events;
 
 namespace Models {
@@ -10,6 +11,7 @@ namespace Models {
         private PlaySettings _currentSettings;
         private Field _field;
         private volatile bool _fieldGenerated;
+        private volatile bool _gameFinished;
 
         public GameManager(FieldFactory fieldFactory) {
             _fieldFactory = fieldFactory;
@@ -19,13 +21,15 @@ namespace Models {
         public event GameFinishedEventHandler OnGameFinished;
 
         public void StartGame(PlaySettings settings) {
+            _fieldGenerated = false;
             _currentSettings = settings;
             _field = _fieldFactory.Create(_currentSettings);
             _fieldGenerated = true;
+            _gameFinished = false;
         }
 
         public void ChangeState(byte row, byte column, CellState newState) {
-            CheckFieldGenerated();
+            CanPlay();
 
             var cell = _field[row, column];
             if (!TryChangeState(newState, cell)) {
@@ -33,6 +37,7 @@ namespace Models {
             }
 
             if (cell.IsMineHere) {
+                _gameFinished = true;
                 OnGameFinished?.Invoke(this, new GameFinishedEventHandlerArgs(false));
                 return;
             }
@@ -41,19 +46,31 @@ namespace Models {
                 OpenAllSafeCells(cell);
             }
 
-            if (GameFinished()) {
+            if (IsVictory()) {
                 OnGameFinished?.Invoke(this, new GameFinishedEventHandlerArgs(true));
             }
         }
 
-        private bool GameFinished() {
-            return !_field.AllCells.Any(e => !e.IsMineHere && e.State != CellState.Opened);
+        private bool IsVictory() {
+            foreach (var cell in _field.AllCells) {
+                if (cell.IsMineHere) {
+                    if (cell.State == CellState.Opened) {
+                        return false;
+                    }
+                } else {
+                    if (cell.State != CellState.Opened) {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
         }
 
         private bool TryChangeState(CellState newState, Cell cell) {
             var changeStateResult = cell.TryChangeState(newState, out var oldState);
             OnCellStateChanged?.Invoke(this,
-                new CellStateChangedEventHandlerArgs(cell.Row, cell.Column, oldState, newState, changeStateResult));
+                new CellStateChangedEventHandlerArgs(cell.Row, cell.Column, newState, oldState, changeStateResult, cell.DisplayString));
             return changeStateResult;
         }
 
@@ -78,6 +95,10 @@ namespace Models {
                     continue;
                 }
 
+                if (!IsSafeCell(curCell)) {
+                    continue;
+                }
+
                 foreach (var neighbor in GetNotOpenedAndNotProcessedNeighbors(curCell, alreadyProcessed)) {
                     needToProcess.Push(neighbor);
                 }
@@ -89,12 +110,14 @@ namespace Models {
                                                            !alreadyProcessed.Contains(e));
         }
 
-        private void CheckFieldGenerated() {
-            if (_fieldGenerated) {
-                return;
+        private void CanPlay() {
+            if (!_fieldGenerated) {
+                throw new InvalidOperationException("Field must generate before a start the game.");
             }
-
-            throw new InvalidOperationException("Field must generate before a start the game.");
+            
+            if (_gameFinished) {
+                throw new InvalidOperationException("Field must re-generate before a start the new game.");
+            }
         }
     }
 }

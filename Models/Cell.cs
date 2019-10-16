@@ -16,7 +16,8 @@ namespace Models {
                 [CellState.Undefined] = new HashSet<CellState> {
                     CellState.Closed,
                     CellState.MineHere
-                }
+                },
+                [CellState.Opened] = new HashSet<CellState>()
             };
 
         public Cell(byte row, byte column) {
