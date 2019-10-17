@@ -31,13 +31,13 @@ namespace Models {
 
         protected void CalculateMineCount(Field field) {
             foreach (var cell in field.AllCells) {
-                if (cell.IsMineHere) {
-                    continue;
-                }
-
-                var neighbors = field.GetNeighbors(cell).ToList();
-                cell.MineAroundCount = (byte) neighbors.Sum(e => e.MineCount);
+                CalculateMineCount(field, cell);
             }
+        }
+
+        public static void CalculateMineCount(Field field, Cell cell) {
+            var neighbors = field.GetNeighbors(cell).ToList();
+            cell.MineAroundCount = (byte) neighbors.Sum(e => e.MineCount);
         }
 
         protected virtual void BeforeMining(Field field, PlaySettings settings) { }

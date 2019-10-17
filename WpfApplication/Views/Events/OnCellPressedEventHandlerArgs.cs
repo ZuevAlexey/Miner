@@ -1,7 +1,7 @@
 using System;
 using System.Windows.Input;
 
-namespace WpfApplication.Views {
+namespace WpfApplication.Views.Events {
     public class OnCellPressedEventHandlerArgs : EventArgs {
         public OnCellPressedEventHandlerArgs(byte row, byte column, MouseButton button) {
             Row = row;

@@ -5,6 +5,7 @@ using System.Windows.Input;
 using Models;
 using Models.Events;
 using WpfApplication.Views;
+using WpfApplication.Views.Events;
 
 namespace WpfApplication {
     public class Presenter {
@@ -16,11 +17,13 @@ namespace WpfApplication {
             };
 
         private readonly IGameManager _gameManager;
-        private readonly ITimerView _timerView;
-        private readonly IMinesCountView _minesCountView;
         private readonly IMatrixView _matrixView;
+        private readonly IMinesCountView _minesCountView;
+        private readonly ITimerView _timerView;
+        private PlaySettings _currentSettings;
 
-        public Presenter(IMatrixView matrixView, IGameManager gameManager, ITimerView timerView, IMinesCountView minesCountView) {
+        public Presenter(IMatrixView matrixView, IGameManager gameManager, ITimerView timerView,
+                         IMinesCountView minesCountView) {
             _matrixView = matrixView;
             _gameManager = gameManager;
             _timerView = timerView;
@@ -37,13 +40,8 @@ namespace WpfApplication {
             _timerView.Start();
         }
 
-        public void StartGame() {
-            var settings = new PlaySettings {
-                Columns = 9,
-                Rows = 9,
-                MineCount = 10
-            };
-            
+        public void StartGame(PlaySettings settings) {
+            _currentSettings = settings;
             _gameManager.StartGame(settings);
             _matrixView.CreateField(settings.Rows, settings.Columns);
             _minesCountView.MinesCount = settings.MineCount;
@@ -78,9 +76,11 @@ namespace WpfApplication {
 
         private void GameManagerGameFinishedEventHandler(object sender, GameFinishedEventHandlerArgs args) {
             _timerView.Stop();
-            var playAgain = MessageBox.Show(Application.Current.MainWindow, args.IsVictory ? "Game Victory! Play again?" : "You loser! Play again?","Game Result", MessageBoxButton.YesNo);
+            var playAgain = MessageBox.Show(Application.Current.MainWindow,
+                args.IsVictory ? "Game Victory! Play again?" : "You loser! Play again?", "Game Result",
+                MessageBoxButton.YesNo);
             if (playAgain == MessageBoxResult.Yes) {
-                StartGame();
+                StartGame(_currentSettings);
             }
         }
 

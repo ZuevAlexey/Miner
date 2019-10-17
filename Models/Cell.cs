@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Models {
     public class Cell {
-        private static readonly Dictionary<CellState, HashSet<CellState>> AllowedСonversions =
+        private static readonly Dictionary<CellState, HashSet<CellState>> _allowedСonversions =
             new Dictionary<CellState, HashSet<CellState>> {
                 [CellState.Closed] = new HashSet<CellState> {
                     CellState.Opened,
@@ -66,7 +66,7 @@ namespace Models {
         /// </summary>
         /// <returns></returns>
         protected virtual bool CanChangeState(CellState newState) {
-            return AllowedСonversions[State].Contains(newState);
+            return _allowedСonversions[State].Contains(newState);
         }
 
         #region Equals

@@ -3,5 +3,6 @@ namespace Models {
         public byte Rows { get; set; }
         public byte Columns { get; set; }
         public int MineCount { get; set; }
+        public bool CanOpenMineFirstTry { get; set; }
     }
 }

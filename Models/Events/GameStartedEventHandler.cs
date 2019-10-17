@@ -1,5 +1,5 @@
 using System;
 
-namespace Models {
+namespace Models.Events {
     public delegate void GameStartedEventHandler(object sender, EventArgs args);
 }

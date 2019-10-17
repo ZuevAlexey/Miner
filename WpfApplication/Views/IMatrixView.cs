@@ -1,4 +1,5 @@
 using Models;
+using WpfApplication.Views.Events;
 
 namespace WpfApplication.Views {
     public interface IMatrixView {

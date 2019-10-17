@@ -36,6 +36,10 @@ namespace Models {
             }
         }
 
+        public void Replace(Cell newCell) {
+            this[newCell.Row, newCell.Column] = newCell;
+        }
+
         public IEnumerable<Cell> GetNeighbors(Cell target) {
             var top = Math.Max(0, target.Row - 1);
             var bottom = Math.Min(Rows - 1, target.Row + 1);

@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Models;
+using WpfApplication.Views.Events;
 
 namespace WpfApplication.Views {
     public class MatrixView : FrameworkElement, IMatrixView {
@@ -89,7 +90,6 @@ namespace WpfApplication.Views {
             }
 
             button.Content = content;
-            
         }
 
         public void CreateField(byte rows, byte columns) {

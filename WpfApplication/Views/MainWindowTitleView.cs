@@ -5,14 +5,14 @@ using System.Windows;
 
 namespace WpfApplication.Views {
     public class MainWindowTitleView : IMinesCountView, ITimerView {
-        private int _minesCount;
-        private Stopwatch _stopwatch;
+        private readonly Stopwatch _stopwatch;
         private readonly Timer _timer;
+        private int _minesCount;
 
         public MainWindowTitleView() {
             _timer = new Timer(TimeSpan.FromSeconds(1).TotalMilliseconds);
             _timer.Elapsed += (sender, args) => { Show(); };
-            
+
             _stopwatch = new Stopwatch();
         }
 
@@ -35,10 +35,9 @@ namespace WpfApplication.Views {
         }
 
         private void Show() {
-            var newTitle = $"Mines count = {_minesCount}; Time elapsed = {(int)_stopwatch.Elapsed.TotalSeconds}";
+            var newTitle = $"Mines count = {_minesCount}; Time elapsed = {(int) _stopwatch.Elapsed.TotalSeconds}";
             Debug.WriteLine(newTitle);
             Application.Current.Dispatcher.Invoke(() => { Application.Current.MainWindow.Title = newTitle; });
-
         }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Models.Events;
 
@@ -29,27 +30,31 @@ namespace Models {
             _fieldGenerated = false;
             _gameStarted = false;
             _gameFinished = false;
-            
+
             _currentSettings = settings;
             _field = _fieldFactory.Create(_currentSettings);
             _fieldGenerated = true;
-            
         }
 
         public void ChangeState(byte row, byte column, CellState newState) {
             CanPlay();
 
             var cell = _field[row, column];
-            if (!TryChangeState(newState, cell)) {
-                return;
-            }
 
             if (!_gameStarted) {
                 _gameStarted = true;
                 OnGameStarted?.Invoke(this, EventArgs.Empty);
+
+                if (cell.IsMineHere && newState == CellState.Opened && !_currentSettings.CanOpenMineFirstTry) {
+                    SwapMine(ref cell);
+                }
             }
 
-            if (cell.IsMineHere && cell.State == CellState.Opened) {
+            if (!TryChangeState(newState, cell)) {
+                return;
+            }
+
+            if (IsBoom(cell)) {
                 _gameFinished = true;
                 OnGameFinished?.Invoke(this, new GameFinishedEventHandlerArgs(false));
                 return;
@@ -62,6 +67,44 @@ namespace Models {
             if (IsVictory()) {
                 OnGameFinished?.Invoke(this, new GameFinishedEventHandlerArgs(true));
             }
+        }
+
+        private void SwapMine(ref Cell cell) {
+            var targetCell = _field.AllCells.First(e => !e.IsMineHere);
+
+            var newOpenedCell = new Cell(cell.Row, cell.Column) {
+                MineAroundCount = cell.MineAroundCount
+            };
+
+            var newTargetCell = new Cell(targetCell.Row, targetCell.Column) {
+                MineAroundCount = targetCell.MineAroundCount
+            };
+            for (var i = 0; i < cell.MineCount; i++) {
+                newTargetCell.TryDropMine();
+            }
+
+            _field.Replace(newOpenedCell);
+            _field.Replace(newTargetCell);
+
+            RecalculateMinesCount(new List<Cell> {newOpenedCell, newTargetCell});
+
+            var newState = cell.State;
+            cell = newOpenedCell;
+            cell.TryChangeState(newState, out var oldState);
+
+            Debug.WriteLine(
+                $"Swap [{newOpenedCell.Row},{newOpenedCell.Column}] and [{newTargetCell.Row},{newTargetCell.Column}]");
+            Debug.WriteLine(_field);
+        }
+
+        private void RecalculateMinesCount(IEnumerable<Cell> cells) {
+            foreach (var recalculatedCell in cells.SelectMany(cell => _field.GetNeighbors(cell))) {
+                FieldFactory.CalculateMineCount(_field, recalculatedCell);
+            }
+        }
+
+        private static bool IsBoom(Cell cell) {
+            return cell.IsMineHere && cell.State == CellState.Opened;
         }
 
         private bool IsVictory() {
