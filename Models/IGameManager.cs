@@ -7,5 +7,6 @@ namespace Models {
         CellState GetCellState(byte row, byte column);
         event CellStateChangedEventHandler OnCellStateChanged;
         event GameFinishedEventHandler OnGameFinished;
+        event GameStartedEventHandler OnGameStarted;
     }
 }

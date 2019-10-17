@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
 using Models;
 using Models.Events;
 using WpfApplication.Views;
@@ -17,32 +16,40 @@ namespace WpfApplication {
             };
 
         private readonly IGameManager _gameManager;
+        private readonly ITimerView _timerView;
+        private readonly IMinesCountView _minesCountView;
         private readonly IMatrixView _matrixView;
 
-        public Presenter(IMatrixView matrixView, IGameManager gameManager) {
+        public Presenter(IMatrixView matrixView, IGameManager gameManager, ITimerView timerView, IMinesCountView minesCountView) {
             _matrixView = matrixView;
             _gameManager = gameManager;
+            _timerView = timerView;
+            _minesCountView = minesCountView;
 
-            _gameManager.OnCellStateChanged += GameManagerOnCellStateChangedEventHandler;
-            _gameManager.OnGameFinished += GameManagerOnGameFinishedEventHandler;
+            _gameManager.OnCellStateChanged += GameManagerCellStateChangedEventHandler;
+            _gameManager.OnGameFinished += GameManagerGameFinishedEventHandler;
+            _gameManager.OnGameStarted += GameManagerGameStarted;
 
-            _matrixView.OnCellPressed += MatrixViewOnCellPressedEventHandler;
+            _matrixView.OnCellPressed += MatrixViewCellPressedEventHandler;
+        }
+
+        private void GameManagerGameStarted(object sender, EventArgs args) {
+            _timerView.Start();
         }
 
         public void StartGame() {
             var settings = new PlaySettings {
-                Columns = 5,
-                Rows = 5,
-                MineCount = 4
+                Columns = 9,
+                Rows = 9,
+                MineCount = 10
             };
             
             _gameManager.StartGame(settings);
-            
             _matrixView.CreateField(settings.Rows, settings.Columns);
-            
+            _minesCountView.MinesCount = settings.MineCount;
         }
 
-        private void MatrixViewOnCellPressedEventHandler(object sender, OnCellPressedEventHandlerArgs args) {
+        private void MatrixViewCellPressedEventHandler(object sender, OnCellPressedEventHandlerArgs args) {
             if (args.Button != MouseButton.Left && args.Button != MouseButton.Right) {
                 return;
             }
@@ -69,13 +76,25 @@ namespace WpfApplication {
             }
         }
 
-        private void GameManagerOnGameFinishedEventHandler(object sender, GameFinishedEventHandlerArgs args) {
-            MessageBox.Show(Application.Current.MainWindow, args.IsVictory ? "Game Victory!" : "You loser!");
-            StartGame();
+        private void GameManagerGameFinishedEventHandler(object sender, GameFinishedEventHandlerArgs args) {
+            _timerView.Stop();
+            var playAgain = MessageBox.Show(Application.Current.MainWindow, args.IsVictory ? "Game Victory! Play again?" : "You loser! Play again?","Game Result", MessageBoxButton.YesNo);
+            if (playAgain == MessageBoxResult.Yes) {
+                StartGame();
+            }
         }
 
-        private void GameManagerOnCellStateChangedEventHandler(object sender, CellStateChangedEventHandlerArgs args) {
+        private void GameManagerCellStateChangedEventHandler(object sender, CellStateChangedEventHandlerArgs args) {
             _matrixView.ChangeCellState(args.Row, args.Column, args.NewState, args.DisplayString);
+
+            if (args.NewState == CellState.MineHere) {
+                _minesCountView.MinesCount--;
+                return;
+            }
+
+            if (args.OldState == CellState.MineHere) {
+                _minesCountView.MinesCount++;
+            }
         }
     }
 }

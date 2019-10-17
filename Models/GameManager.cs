@@ -11,6 +11,7 @@ namespace Models {
         private Field _field;
         private volatile bool _fieldGenerated;
         private volatile bool _gameFinished;
+        private volatile bool _gameStarted;
 
         public GameManager(FieldFactory fieldFactory) {
             _fieldFactory = fieldFactory;
@@ -22,13 +23,17 @@ namespace Models {
 
         public event CellStateChangedEventHandler OnCellStateChanged;
         public event GameFinishedEventHandler OnGameFinished;
+        public event GameStartedEventHandler OnGameStarted;
 
         public void StartGame(PlaySettings settings) {
             _fieldGenerated = false;
+            _gameStarted = false;
+            _gameFinished = false;
+            
             _currentSettings = settings;
             _field = _fieldFactory.Create(_currentSettings);
             _fieldGenerated = true;
-            _gameFinished = false;
+            
         }
 
         public void ChangeState(byte row, byte column, CellState newState) {
@@ -39,7 +44,12 @@ namespace Models {
                 return;
             }
 
-            if (cell.IsMineHere) {
+            if (!_gameStarted) {
+                _gameStarted = true;
+                OnGameStarted?.Invoke(this, EventArgs.Empty);
+            }
+
+            if (cell.IsMineHere && cell.State == CellState.Opened) {
                 _gameFinished = true;
                 OnGameFinished?.Invoke(this, new GameFinishedEventHandlerArgs(false));
                 return;

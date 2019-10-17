@@ -1,4 +1,5 @@
 ﻿using Models;
+using WpfApplication.Views;
 
 namespace WpfApplication {
     /// <summary>
@@ -9,7 +10,8 @@ namespace WpfApplication {
         
         public MainWindow() {
             InitializeComponent();
-            _presenter = new Presenter(Field, new GameManager(new FieldFactory(new SimpleMiningAlgorithm())));
+            var mainWindowView = new MainWindowTitleView();
+            _presenter = new Presenter(Field, new GameManager(new FieldFactory(new SimpleMiningAlgorithm())), mainWindowView, mainWindowView);
             _presenter.StartGame();
         }
     }
