@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Models.Events;
 
 namespace Models {
@@ -15,6 +14,10 @@ namespace Models {
 
         public GameManager(FieldFactory fieldFactory) {
             _fieldFactory = fieldFactory;
+        }
+
+        public CellState GetCellState(byte row, byte column) {
+            return _field[row, column].State;
         }
 
         public event CellStateChangedEventHandler OnCellStateChanged;
@@ -57,7 +60,8 @@ namespace Models {
                     if (cell.State == CellState.Opened) {
                         return false;
                     }
-                } else {
+                }
+                else {
                     if (cell.State != CellState.Opened) {
                         return false;
                     }
@@ -70,7 +74,8 @@ namespace Models {
         private bool TryChangeState(CellState newState, Cell cell) {
             var changeStateResult = cell.TryChangeState(newState, out var oldState);
             OnCellStateChanged?.Invoke(this,
-                new CellStateChangedEventHandlerArgs(cell.Row, cell.Column, newState, oldState, changeStateResult, cell.DisplayString));
+                new CellStateChangedEventHandlerArgs(cell.Row, cell.Column, newState, oldState, changeStateResult,
+                    cell.DisplayString));
             return changeStateResult;
         }
 
@@ -114,7 +119,7 @@ namespace Models {
             if (!_fieldGenerated) {
                 throw new InvalidOperationException("Field must generate before a start the game.");
             }
-            
+
             if (_gameFinished) {
                 throw new InvalidOperationException("Field must re-generate before a start the new game.");
             }

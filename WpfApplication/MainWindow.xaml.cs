@@ -1,31 +1,16 @@
-﻿using System;
-using System.Windows.Input;
+﻿using Models;
 
 namespace WpfApplication {
     /// <summary>
     ///     Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow {
+        private readonly Presenter _presenter;
+        
         public MainWindow() {
             InitializeComponent();
-            KeyDown += (sender, args) => {
-                switch (args.Key) {
-                    case Key.Down:
-                        Field.Rows++;
-                        break;
-                    case Key.Up:
-                        Field.Rows--;
-                        break;
-                    case Key.Left:
-                        Field.Columns--;
-                        break;
-                    case Key.Right:
-                        Field.Columns++;
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            };
+            _presenter = new Presenter(Field, new GameManager(new FieldFactory(new SimpleMiningAlgorithm())));
+            _presenter.StartGame();
         }
     }
 }

@@ -5,6 +5,7 @@ namespace Models.Events {
         public GameFinishedEventHandlerArgs(bool isVictory) {
             IsVictory = isVictory;
         }
-        public bool IsVictory { get;}
+
+        public bool IsVictory { get; }
     }
 }

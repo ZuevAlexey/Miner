@@ -2,7 +2,8 @@ using System;
 
 namespace Models.Events {
     public class CellStateChangedEventHandlerArgs : EventArgs {
-        public CellStateChangedEventHandlerArgs(byte row, byte column, CellState newState, CellState oldState, bool isSuccess, string displayString) {
+        public CellStateChangedEventHandlerArgs(byte row, byte column, CellState newState, CellState oldState,
+                                                bool isSuccess, string displayString) {
             Row = row;
             Column = column;
             NewState = newState;
