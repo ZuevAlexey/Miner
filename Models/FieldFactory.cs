@@ -37,7 +37,7 @@ namespace Models {
 
         public static void CalculateMineCount(Field field, Cell cell) {
             var neighbors = field.GetNeighbors(cell).ToList();
-            cell.MineAroundCount = (byte) neighbors.Sum(e => e.MineCount);
+            cell.MineAroundCount = (byte) neighbors.Count(e => e.IsMineHere);
         }
 
         protected virtual void BeforeMining(Field field, PlaySettings settings) { }

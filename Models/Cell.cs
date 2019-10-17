@@ -23,12 +23,9 @@ namespace Models {
         public Cell(byte row, byte column) {
             Row = row;
             Column = column;
-            MineCount = 0;
         }
 
         public bool IsMineHere { get; private set; }
-        public byte MineCount { get; private set; }
-
         public byte Row { get; }
         public byte Column { get; }
 
@@ -43,7 +40,6 @@ namespace Models {
             }
 
             IsMineHere = true;
-            MineCount = 1;
             return true;
         }
 

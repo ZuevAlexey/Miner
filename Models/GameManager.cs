@@ -36,7 +36,7 @@ namespace Models {
             _fieldGenerated = true;
         }
 
-        public void ChangeState(byte row, byte column, CellState newState) {
+        public void TryChangeState(byte row, byte column, CellState newState) {
             CanPlay();
 
             var cell = _field[row, column];
@@ -79,9 +79,7 @@ namespace Models {
             var newTargetCell = new Cell(targetCell.Row, targetCell.Column) {
                 MineAroundCount = targetCell.MineAroundCount
             };
-            for (var i = 0; i < cell.MineCount; i++) {
-                newTargetCell.TryDropMine();
-            }
+            newTargetCell.TryDropMine();
 
             _field.Replace(newOpenedCell);
             _field.Replace(newTargetCell);
@@ -113,8 +111,7 @@ namespace Models {
                     if (cell.State == CellState.Opened) {
                         return false;
                     }
-                }
-                else {
+                } else {
                     if (cell.State != CellState.Opened) {
                         return false;
                     }
@@ -126,9 +123,11 @@ namespace Models {
 
         private bool TryChangeState(CellState newState, Cell cell) {
             var changeStateResult = cell.TryChangeState(newState, out var oldState);
-            OnCellStateChanged?.Invoke(this,
-                new CellStateChangedEventHandlerArgs(cell.Row, cell.Column, newState, oldState, changeStateResult,
-                    cell.DisplayString));
+            if (changeStateResult) {
+                OnCellStateChanged?.Invoke(this,
+                    new CellStateChangedEventHandlerArgs(cell.Row, cell.Column, newState, oldState, cell.DisplayString));
+            }
+            
             return changeStateResult;
         }
 
@@ -140,7 +139,7 @@ namespace Models {
             var alreadyProcessed = new HashSet<Cell> {
                 cell
             };
-            var needToProcess = new Stack<Cell>(GetNotOpenedAndNotProcessedNeighbors(cell, alreadyProcessed));
+            var needToProcess = new Stack<Cell>(GetNotOpenedAndNotProcessedNeighbors(cell, null));
             while (needToProcess.Count > 0) {
                 var curCell = needToProcess.Pop();
                 if (alreadyProcessed.Contains(curCell)) {
@@ -163,9 +162,9 @@ namespace Models {
             }
         }
 
-        private IEnumerable<Cell> GetNotOpenedAndNotProcessedNeighbors(Cell curCell, HashSet<Cell> alreadyProcessed) {
+        private IEnumerable<Cell> GetNotOpenedAndNotProcessedNeighbors(Cell curCell, HashSet<Cell> alreadyProcessed = null) {
             return _field.GetNeighbors(curCell).Where(e => e.State != CellState.Opened &&
-                                                           !alreadyProcessed.Contains(e));
+                                                           !(alreadyProcessed?.Contains(e) ?? false));
         }
 
         private void CanPlay() {

@@ -64,13 +64,13 @@ namespace WpfApplication {
 
         private void HandleRightClick(CellState curState, byte row, byte column) {
             if (_rightClickStateChain.TryGetValue(curState, out var nextState)) {
-                _gameManager.ChangeState(row, column, nextState);
+                _gameManager.TryChangeState(row, column, nextState);
             }
         }
 
         private void HandleLeftClick(OnCellPressedEventHandlerArgs args, CellState curState) {
             if (curState == CellState.Closed) {
-                _gameManager.ChangeState(args.Row, args.Column, CellState.Opened);
+                _gameManager.TryChangeState(args.Row, args.Column, CellState.Opened);
             }
         }
 

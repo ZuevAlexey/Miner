@@ -5,7 +5,7 @@ namespace Models {
     ///     Simple mining algorithm based on the Random and retrying if failed
     /// </summary>
     public class SimpleMiningAlgorithm : IMiningAlgorithm {
-        private static readonly Random Random = new Random();
+        private static readonly Random _random = new Random();
 
         public void DropMines(Field field, PlaySettings settings) {
             if (settings.MineCount > field.Size) {
@@ -14,7 +14,7 @@ namespace Models {
 
             var currentMineCount = 0;
             while (currentMineCount < settings.MineCount) {
-                var newMineIndex = Random.Next(0, field.Size);
+                var newMineIndex = _random.Next(0, field.Size);
                 if (field[newMineIndex].TryDropMine()) {
                     currentMineCount++;
                 }

@@ -36,7 +36,6 @@ namespace WpfApplication.Views {
 
         private void Show() {
             var newTitle = $"Mines count = {_minesCount}; Time elapsed = {(int) _stopwatch.Elapsed.TotalSeconds}";
-            Debug.WriteLine(newTitle);
             Application.Current.Dispatcher.Invoke(() => { Application.Current.MainWindow.Title = newTitle; });
         }
     }
