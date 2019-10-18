@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using Models.Events;
 
 namespace Models {
@@ -26,13 +27,14 @@ namespace Models {
         public event GameFinishedEventHandler OnGameFinished;
         public event GameStartedEventHandler OnGameStarted;
 
-        public void StartGame(PlaySettings settings) {
+        public async void StartGame(PlaySettings settings) {
             _fieldGenerated = false;
             _gameStarted = false;
             _gameFinished = false;
 
             _currentSettings = settings;
             _field = _fieldFactory.Create(_currentSettings);
+            
             _fieldGenerated = true;
         }
 

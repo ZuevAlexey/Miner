@@ -9,7 +9,7 @@ namespace Models {
             _miningAlgorithm = miningAlgorithm;
         }
 
-        public Field Create(PlaySettings settings) {
+        public virtual Field Create(PlaySettings settings) {
             var result = new Field(settings.Rows, settings.Columns);
             for (byte i = 0; i < result.Rows; i++) {
                 for (byte j = 0; j < result.Columns; j++) {

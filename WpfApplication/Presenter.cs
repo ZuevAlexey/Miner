@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Models;
@@ -40,9 +41,9 @@ namespace WpfApplication {
             _timerView.Start();
         }
 
-        public void StartGame(PlaySettings settings) {
+        public async Task StartGame(PlaySettings settings) {
             _currentSettings = settings;
-            _gameManager.StartGame(settings);
+            await Task.Run(() => _gameManager.StartGame(settings));
             _matrixView.CreateField(settings.Rows, settings.Columns);
             _minesCountView.MinesCount = settings.MineCount;
         }
