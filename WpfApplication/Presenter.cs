@@ -88,6 +88,12 @@ namespace WpfApplication {
 
         private void GameManagerGameFinishedEventHandler(object sender, GameFinishedEventHandlerArgs args) {
             _timerView.Stop();
+            if (args.MinePositions != null) {
+                foreach (var position in args.MinePositions) {
+                    _matrixView.ChangeCellState(position, CellState.Opened, true, 0);
+                }
+            }
+            
             var playAgain = MessageBox.Show(Application.Current.MainWindow,
                 args.IsVictory ? "Game Victory! Play again?" : "You loser! Play again?", "Game Result",
                 MessageBoxButton.YesNo);

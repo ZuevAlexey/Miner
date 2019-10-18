@@ -53,7 +53,7 @@ namespace Models {
 
             if (IsBoom(cell)) {
                 _gameFinished = true;
-                OnGameFinished?.Invoke(this, new GameFinishedEventHandlerArgs(false));
+                OnGameFinished?.Invoke(this, new GameFinishedEventHandlerArgs(false, _field.AllCells.Where(e => e.IsMineHere).Select(e => e.Position).ToList()));
                 return;
             }
 
@@ -62,7 +62,7 @@ namespace Models {
             }
 
             if (IsVictory()) {
-                OnGameFinished?.Invoke(this, new GameFinishedEventHandlerArgs(true));
+                OnGameFinished?.Invoke(this, new GameFinishedEventHandlerArgs(true, null));
             }
         }
 
