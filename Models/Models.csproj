@@ -39,9 +39,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cell.cs" />
-    <Compile Include="CellState.cs" />
-    <Compile Include="Events\CellStateChangedEventHandler.cs" />
-    <Compile Include="Events\CellStateChangedEventHandlerArgs.cs" />
+    <Compile Include="Events\CellOpenedEventHandler.cs" />
+    <Compile Include="Events\CellOpenedEventHandlerArgs.cs" />
     <Compile Include="Events\GameFinishedEventHandler.cs" />
     <Compile Include="Events\GameFinishedEventHandlerArgs.cs" />
     <Compile Include="Events\GameStartedEventHandler.cs" />

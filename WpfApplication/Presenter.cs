@@ -30,7 +30,7 @@ namespace WpfApplication {
             _timerView = timerView;
             _minesCountView = minesCountView;
 
-            _gameManager.OnCellStateChanged += GameManagerCellStateChangedEventHandler;
+            _gameManager.OnCellStateChanged += GameManagerCellOpenedEventHandler;
             _gameManager.OnGameFinished += GameManagerGameFinishedEventHandler;
             _gameManager.OnGameStarted += GameManagerGameStarted;
 
@@ -53,7 +53,9 @@ namespace WpfApplication {
                 return;
             }
 
-            var curState = _gameManager.GetCellState(args.Row, args.Column);
+            //TODO : брать из ICellView
+//            var curState = _gameManager.GetCellState(args.Row, args.Column);
+            var curState = CellState.Closed;
 
             if (args.Button == MouseButton.Left) {
                 HandleLeftClick(args, curState);
@@ -65,13 +67,23 @@ namespace WpfApplication {
 
         private void HandleRightClick(CellState curState, byte row, byte column) {
             if (_rightClickStateChain.TryGetValue(curState, out var nextState)) {
-                _gameManager.TryChangeState(row, column, nextState);
+                //TODO: Change IViewCell.State
+                
+                
+                if (nextState == CellState.MineHere) {
+                    _minesCountView.MinesCount--;
+                    return;
+                }
+
+                if (nextState == CellState.MineHere) {
+                    _minesCountView.MinesCount++;
+                }
             }
         }
 
         private void HandleLeftClick(OnCellPressedEventHandlerArgs args, CellState curState) {
             if (curState == CellState.Closed) {
-                _gameManager.TryChangeState(args.Row, args.Column, CellState.Opened);
+                _gameManager.TryOpen(args.Row, args.Column);
             }
         }
 
@@ -85,17 +97,10 @@ namespace WpfApplication {
             }
         }
 
-        private void GameManagerCellStateChangedEventHandler(object sender, CellStateChangedEventHandlerArgs args) {
-            _matrixView.ChangeCellState(args.Row, args.Column, args.NewState, args.DisplayString);
+        private void GameManagerCellOpenedEventHandler(object sender, CellOpenedEventHandlerArgs args) {
+            _matrixView.ChangeCellState(args.Row, args.Column, CellState.Opened, args.DisplayString);
 
-            if (args.NewState == CellState.MineHere) {
-                _minesCountView.MinesCount--;
-                return;
-            }
-
-            if (args.OldState == CellState.MineHere) {
-                _minesCountView.MinesCount++;
-            }
+            
         }
     }
 }

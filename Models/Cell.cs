@@ -1,25 +1,5 @@
-using System.Collections.Generic;
-
 namespace Models {
     public class Cell {
-        private static readonly Dictionary<CellState, HashSet<CellState>> _allowedСonversions =
-            new Dictionary<CellState, HashSet<CellState>> {
-                [CellState.Closed] = new HashSet<CellState> {
-                    CellState.Opened,
-                    CellState.Undefined,
-                    CellState.MineHere
-                },
-                [CellState.MineHere] = new HashSet<CellState> {
-                    CellState.Closed,
-                    CellState.Undefined
-                },
-                [CellState.Undefined] = new HashSet<CellState> {
-                    CellState.Closed,
-                    CellState.MineHere
-                },
-                [CellState.Opened] = new HashSet<CellState>()
-            };
-
         public Cell(byte row, byte column) {
             Row = row;
             Column = column;
@@ -29,7 +9,7 @@ namespace Models {
         public byte Row { get; }
         public byte Column { get; }
 
-        public CellState State { get; private set; }
+        public bool IsOpened { get; private set; }
 
         public byte MineAroundCount { get; set; }
         public string DisplayString => IsMineHere ? "M" : MineAroundCount.ToString();
@@ -47,22 +27,21 @@ namespace Models {
             return $"[{Row},{Column}] - {DisplayString}";
         }
 
-        public bool TryChangeState(CellState newState, out CellState oldState) {
-            oldState = State;
-            if (!CanChangeState(newState)) {
+        public bool TryOpen() {
+            if (!CanOpen()) {
                 return false;
             }
 
-            State = newState;
+            IsOpened = true;
             return true;
         }
 
         /// <summary>
-        ///     Is it possible to switch to a new state
+        ///     Is it possible to open Cell
         /// </summary>
         /// <returns></returns>
-        protected virtual bool CanChangeState(CellState newState) {
-            return _allowedСonversions[State].Contains(newState);
+        protected virtual bool CanOpen() {
+            return !IsOpened;
         }
 
         #region Equals

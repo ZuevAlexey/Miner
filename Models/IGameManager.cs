@@ -3,9 +3,8 @@ using Models.Events;
 namespace Models {
     public interface IGameManager {
         void StartGame(PlaySettings settings);
-        void TryChangeState(byte row, byte column, CellState newState);
-        CellState GetCellState(byte row, byte column);
-        event CellStateChangedEventHandler OnCellStateChanged;
+        void TryOpen(byte row, byte column);
+        event CellOpenedEventHandler OnCellStateChanged;
         event GameFinishedEventHandler OnGameFinished;
         event GameStartedEventHandler OnGameStarted;
     }

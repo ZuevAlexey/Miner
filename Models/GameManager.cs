@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 using Models.Events;
 
 namespace Models {
@@ -19,11 +18,7 @@ namespace Models {
             _fieldFactory = fieldFactory;
         }
 
-        public CellState GetCellState(byte row, byte column) {
-            return _field[row, column].State;
-        }
-
-        public event CellStateChangedEventHandler OnCellStateChanged;
+        public event CellOpenedEventHandler OnCellStateChanged;
         public event GameFinishedEventHandler OnGameFinished;
         public event GameStartedEventHandler OnGameStarted;
 
@@ -38,7 +33,7 @@ namespace Models {
             _fieldGenerated = true;
         }
 
-        public void TryChangeState(byte row, byte column, CellState newState) {
+        public void TryOpen(byte row, byte column) {
             CanPlay();
 
             var cell = _field[row, column];
@@ -47,12 +42,12 @@ namespace Models {
                 _gameStarted = true;
                 OnGameStarted?.Invoke(this, EventArgs.Empty);
 
-                if (cell.IsMineHere && newState == CellState.Opened && !_currentSettings.CanOpenMineFirstTry) {
+                if (cell.IsMineHere && !_currentSettings.CanOpenMineFirstTry) {
                     SwapMine(ref cell);
                 }
             }
 
-            if (!TryChangeState(newState, cell)) {
+            if (!TryOpen(cell)) {
                 return;
             }
 
@@ -62,7 +57,7 @@ namespace Models {
                 return;
             }
 
-            if (newState == CellState.Opened && IsSafeCell(cell)) {
+            if (IsSafeCell(cell)) {
                 OpenAllSafeCells(cell);
             }
 
@@ -88,9 +83,8 @@ namespace Models {
 
             RecalculateMinesCount(new List<Cell> {newOpenedCell, newTargetCell});
 
-            var newState = cell.State;
             cell = newOpenedCell;
-            cell.TryChangeState(newState, out var oldState);
+            cell.TryOpen();
 
             Debug.WriteLine(
                 $"Swap [{newOpenedCell.Row},{newOpenedCell.Column}] and [{newTargetCell.Row},{newTargetCell.Column}]");
@@ -104,17 +98,17 @@ namespace Models {
         }
 
         private static bool IsBoom(Cell cell) {
-            return cell.IsMineHere && cell.State == CellState.Opened;
+            return cell.IsMineHere && cell.IsOpened;
         }
 
         private bool IsVictory() {
             foreach (var cell in _field.AllCells) {
                 if (cell.IsMineHere) {
-                    if (cell.State == CellState.Opened) {
+                    if (cell.IsOpened) {
                         return false;
                     }
                 } else {
-                    if (cell.State != CellState.Opened) {
+                    if (!cell.IsOpened) {
                         return false;
                     }
                 }
@@ -123,11 +117,11 @@ namespace Models {
             return true;
         }
 
-        private bool TryChangeState(CellState newState, Cell cell) {
-            var changeStateResult = cell.TryChangeState(newState, out var oldState);
+        private bool TryOpen(Cell cell) {
+            var changeStateResult = cell.TryOpen();
             if (changeStateResult) {
                 OnCellStateChanged?.Invoke(this,
-                    new CellStateChangedEventHandlerArgs(cell.Row, cell.Column, newState, oldState, cell.DisplayString));
+                    new CellOpenedEventHandlerArgs(cell.Row, cell.Column, cell.DisplayString));
             }
             
             return changeStateResult;
@@ -150,7 +144,7 @@ namespace Models {
 
                 alreadyProcessed.Add(curCell);
 
-                if (!TryChangeState(CellState.Opened, curCell)) {
+                if (!TryOpen(curCell)) {
                     continue;
                 }
 
@@ -165,8 +159,7 @@ namespace Models {
         }
 
         private IEnumerable<Cell> GetNotOpenedAndNotProcessedNeighbors(Cell curCell, HashSet<Cell> alreadyProcessed = null) {
-            return _field.GetNeighbors(curCell).Where(e => e.State != CellState.Opened &&
-                                                           !(alreadyProcessed?.Contains(e) ?? false));
+            return _field.GetNeighbors(curCell).Where(e => !e.IsOpened && !(alreadyProcessed?.Contains(e) ?? false));
         }
 
         private void CanPlay() {
