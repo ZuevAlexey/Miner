@@ -1,5 +1,7 @@
-﻿using Models;
+﻿using System.Diagnostics;
+using Models;
 using WpfApplication.Views;
+using WpfApplication.Views.Debug;
 
 namespace WpfApplication {
     /// <summary>
@@ -10,9 +12,14 @@ namespace WpfApplication {
 
         public MainWindow() {
             InitializeComponent();
-            var mainWindowView = new MainWindowTitleView();
-            _presenter = new Presenter(Field, new GameManager(new FieldFactory(new SimpleMiningAlgorithm())),
-                mainWindowView, mainWindowView);
+            var mainWindowView = new DebugTitleView();
+            var gameManager = new GameManager(new FieldFactory(new SimpleMiningAlgorithm()));
+            gameManager.OnCellOpened += (sender, args) => Debug.WriteLine($"OnCellOpened {args}");
+            gameManager.OnGameFinished += (sender, args) => Debug.WriteLine($"GameFinished {args.IsVictory}");
+            gameManager.OnGameStarted += (sender, args) => Debug.WriteLine($"Game Started");
+            
+            
+            _presenter = new Presenter(Field, gameManager, mainWindowView, mainWindowView);
             _presenter.StartGame(new PlaySettings {
                 Columns = 9,
                 Rows = 9,

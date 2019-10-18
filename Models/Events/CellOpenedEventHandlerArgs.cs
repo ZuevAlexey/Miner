@@ -1,20 +1,20 @@
 using System;
+using System.Runtime;
 
 namespace Models.Events {
     public class CellOpenedEventHandlerArgs : EventArgs {
-        public CellOpenedEventHandlerArgs(byte row, byte column, string displayString) {
-            Row = row;
-            Column = column;
-            DisplayString = displayString;
+        public CellOpenedEventHandlerArgs(Position position, bool isMineHere, byte minesAroundCount) {
+            Position = position;
+            IsMineHere = isMineHere;
+            MinesAroundCount = minesAroundCount;
         }
 
-        public byte Row { get; }
-        public byte Column { get; }
-
-        public string DisplayString { get; }
+        public Position Position { get; }
+        public bool IsMineHere { get; }
+        public byte MinesAroundCount { get; }
 
         public override string ToString() {
-            return $"{Row}; {Column}; {DisplayString}";
+            return $"{Position.Row}; {Position.Column}; {IsMineHere}; {MinesAroundCount}";
         }
     }
 }

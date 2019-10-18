@@ -50,6 +50,7 @@
     <Compile Include="IGameManager.cs" />
     <Compile Include="IMiningAlgorithm.cs" />
     <Compile Include="PlaySettings.cs" />
+    <Compile Include="Position.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SimpleMiningAlgorithm.cs" />
   </ItemGroup>

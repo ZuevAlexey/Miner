@@ -18,7 +18,7 @@ namespace Models {
             _fieldFactory = fieldFactory;
         }
 
-        public event CellOpenedEventHandler OnCellStateChanged;
+        public event CellOpenedEventHandler OnCellOpened;
         public event GameFinishedEventHandler OnGameFinished;
         public event GameStartedEventHandler OnGameStarted;
 
@@ -33,10 +33,10 @@ namespace Models {
             _fieldGenerated = true;
         }
 
-        public void TryOpen(byte row, byte column) {
+        public void TryOpen(Position position) {
             CanPlay();
 
-            var cell = _field[row, column];
+            var cell = _field[position];
 
             if (!_gameStarted) {
                 _gameStarted = true;
@@ -69,11 +69,11 @@ namespace Models {
         private void SwapMine(ref Cell cell) {
             var targetCell = _field.AllCells.First(e => !e.IsMineHere);
 
-            var newOpenedCell = new Cell(cell.Row, cell.Column) {
+            var newOpenedCell = new Cell(cell.Position) {
                 MineAroundCount = cell.MineAroundCount
             };
 
-            var newTargetCell = new Cell(targetCell.Row, targetCell.Column) {
+            var newTargetCell = new Cell(targetCell.Position) {
                 MineAroundCount = targetCell.MineAroundCount
             };
             newTargetCell.TryDropMine();
@@ -84,10 +84,9 @@ namespace Models {
             RecalculateMinesCount(new List<Cell> {newOpenedCell, newTargetCell});
 
             cell = newOpenedCell;
-            cell.TryOpen();
 
             Debug.WriteLine(
-                $"Swap [{newOpenedCell.Row},{newOpenedCell.Column}] and [{newTargetCell.Row},{newTargetCell.Column}]");
+                $"Swap [{newOpenedCell.Position.Row},{newOpenedCell.Position.Column}] and [{newTargetCell.Position.Row},{newTargetCell.Position.Column}]");
             Debug.WriteLine(_field);
         }
 
@@ -120,8 +119,8 @@ namespace Models {
         private bool TryOpen(Cell cell) {
             var changeStateResult = cell.TryOpen();
             if (changeStateResult) {
-                OnCellStateChanged?.Invoke(this,
-                    new CellOpenedEventHandlerArgs(cell.Row, cell.Column, cell.DisplayString));
+                OnCellOpened?.Invoke(this,
+                    new CellOpenedEventHandlerArgs(cell.Position, cell.IsMineHere, cell.MineAroundCount));
             }
             
             return changeStateResult;

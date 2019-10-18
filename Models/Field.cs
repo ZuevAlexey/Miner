@@ -16,9 +16,9 @@ namespace Models {
         public byte Rows { get; }
         public byte Columns { get; }
 
-        public virtual Cell this[int row, int column] {
-            get => _cells[row, column];
-            protected internal set => _cells[row, column] = value;
+        public virtual Cell this[Position position] {
+            get => _cells[position.Row, position.Column];
+            protected internal set => _cells[position.Row, position.Column] = value;
         }
 
         public virtual Cell this[int index] {
@@ -37,18 +37,18 @@ namespace Models {
         }
 
         public void Replace(Cell newCell) {
-            this[newCell.Row, newCell.Column] = newCell;
+            this[newCell.Position] = newCell;
         }
 
         public IEnumerable<Cell> GetNeighbors(Cell target) {
-            var top = Math.Max(0, target.Row - 1);
-            var bottom = Math.Min(Rows - 1, target.Row + 1);
-            var left = Math.Max(0, target.Column - 1);
-            var right = Math.Min(Columns - 1, target.Column + 1);
+            var top = Math.Max(0, target.Position.Row - 1);
+            var bottom = Math.Min(Rows - 1, target.Position.Row + 1);
+            var left = Math.Max(0, target.Position.Column - 1);
+            var right = Math.Min(Columns - 1, target.Position.Column + 1);
 
             for (var row = top; row <= bottom; row++) {
                 for (var col = left; col <= right; col++) {
-                    if (row != target.Row || col != target.Column) {
+                    if (row != target.Position.Row || col != target.Position.Column) {
                         yield return _cells[row, col];
                     }
                 }

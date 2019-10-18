@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Models.Events {
     public class GameFinishedEventHandlerArgs : EventArgs {
@@ -7,5 +8,6 @@ namespace Models.Events {
         }
 
         public bool IsVictory { get; }
+        public List<Position> MinePositions { get; set; }
     }
 }

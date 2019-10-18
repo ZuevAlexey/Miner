@@ -1,16 +1,15 @@
 using System;
 using System.Windows.Input;
+using Models;
 
 namespace WpfApplication.Views.Events {
     public class OnCellPressedEventHandlerArgs : EventArgs {
-        public OnCellPressedEventHandlerArgs(byte row, byte column, MouseButton button) {
-            Row = row;
-            Column = column;
+        public OnCellPressedEventHandlerArgs(Position position, MouseButton button) {
+            Position = position;
             Button = button;
         }
 
-        public byte Row { get; }
-        public byte Column { get; }
+        public Position Position { get; }
         public MouseButton Button { get; }
     }
 }

@@ -1,18 +1,20 @@
 using System;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using Models;
 using WpfApplication.Views.Events;
 
 namespace WpfApplication.Views {
-    public class MatrixView : FrameworkElement, IMatrixView {
+    public class MatrixView<T> : FrameworkElement, IMatrixView where T:BaseCellView, new() {
         /// <summary>Rows Dependency Property</summary>
         public static readonly DependencyProperty RowsProperty =
             DependencyProperty.Register(
                 nameof(Rows),
                 typeof(byte),
-                typeof(MatrixView),
+                typeof(MatrixView<T>),
                 new FrameworkPropertyMetadata(
                     byte.MinValue,
                     FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange,
@@ -23,13 +25,13 @@ namespace WpfApplication.Views {
             DependencyProperty.Register(
                 nameof(Columns),
                 typeof(byte),
-                typeof(MatrixView),
+                typeof(MatrixView<T>),
                 new FrameworkPropertyMetadata(
                     byte.MinValue, // default value
                     FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange,
                     OnColumnsChanged));
 
-        private Button[,] _buttons;
+        private BaseCellView[,] _cells;
 
         /// <summary>
         ///     Style property
@@ -47,73 +49,44 @@ namespace WpfApplication.Views {
             set => SetValue(ColumnsProperty, value);
         }
 
-        protected override int VisualChildrenCount => _buttons?.Length ?? 0;
+        protected override int VisualChildrenCount => _cells?.Length ?? 0;
 
         public event OnCellPressedEventHandler OnCellPressed;
 
-        public void ChangeCellState(byte row, byte column, CellState newState, string displayString) {
-            string content = null;
-            Brush newBrush = null;
-
-            var button = _buttons[row, column];
-            switch (newState) {
-                case CellState.Closed:
-                    content = "";
-                    break;
-                case CellState.Opened:
-                    content = displayString;
-                    if (content == "M") {
-                        newBrush = Brushes.Black;
-                        break;
-                    }
-
-                    var val = byte.Parse(content);
-                    if (val > 0) {
-                        newBrush = Brushes.Firebrick;
-                        break;
-                    }
-
-                    newBrush = Brushes.Aquamarine;
-                    break;
-                case CellState.MineHere:
-                    content = "!";
-                    break;
-                case CellState.Undefined:
-                    content = "?";
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-
-            if (newBrush != null) {
-                button.Background = newBrush;
-            }
-
-            button.Content = content;
+        public void ChangeCellState(Position position, CellState newState, bool isMineHere, byte minesAroundCount) {
+            var cell = _cells[position.Row, position.Column];
+            cell.MinesAroundCount = minesAroundCount;
+            cell.IsMineHere = isMineHere;
+            cell.State = newState;
         }
 
         public void CreateField(byte rows, byte columns) {
-            if (_buttons != null) {
-                foreach (var button in _buttons) {
+            if (rows == Rows && columns == Columns) {
+                foreach (var cell in _cells) {
+                    cell.State = CellState.Closed;
+                }
+
+                return;
+            }
+            
+            if (_cells != null) {
+                foreach (var button in _cells) {
                     RemoveVisualChild(button);
                 }
             }
 
-            _buttons = new Button[rows, columns];
+            _cells = new BaseCellView[rows, columns];
+            
             for (byte row = 0; row < rows; row++) {
                 for (byte col = 0; col < columns; col++) {
-                    var btn = new Button {
-                        DataContext = $"{row};{col}"
+                    var cell = new T {
+                        Position = new Position(row, col),
+                        State = CellState.Closed
                     };
 
-                    btn.PreviewMouseDown += (sender, args) => {
-                        var context = (string) (sender as Button).DataContext;
-                        var r = byte.Parse(context.Split(';')[0]);
-                        var c = byte.Parse(context.Split(';')[1]);
-                        OnCellPressed?.Invoke(this, new OnCellPressedEventHandlerArgs(r, c, args.ChangedButton));
-                    };
-                    _buttons[row, col] = btn;
-                    AddVisualChild(btn);
+                    cell.PreviewMouseDown += CellPreviewMouseDownEventHandler;
+                    _cells[row, col] = cell;
+                    AddVisualChild(cell);
                 }
             }
 
@@ -121,27 +94,36 @@ namespace WpfApplication.Views {
             Columns = columns;
         }
 
+        public CellState GetCellState(Position position) {
+            return _cells[position.Row, position.Column].State;
+        }
+
+        private void CellPreviewMouseDownEventHandler(object sender, MouseButtonEventArgs args) {
+            var cell = (sender as T);
+            OnCellPressed?.Invoke(this, new OnCellPressedEventHandlerArgs(cell.Position, args.ChangedButton));
+        }
+
         private static void OnRowsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
-            if (d is MatrixView testCustomControl) {
-                testCustomControl.Rows = (byte) e.NewValue;
+            if (d is MatrixView<T> matrixView) {
+                matrixView.Rows = (byte) e.NewValue;
             }
         }
 
         private static void OnColumnsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
-            if (d is MatrixView testCustomControl) {
-                testCustomControl.Columns = (byte) e.NewValue;
+            if (d is MatrixView<T> matrixView) {
+                matrixView.Columns = (byte) e.NewValue;
             }
         }
 
         protected override Visual GetVisualChild(int index) {
-            return _buttons[index / Columns, index % Columns];
+            return _cells[index / Columns, index % Columns];
         }
 
         protected override Size MeasureOverride(Size constraint) {
-            if (IsEmpty()) {
-                return Size.Empty;
+            if (constraint.Width < 50 || constraint.Height < 50) {
+                return new Size(50, 50); 
             }
-
+            
             return constraint;
         }
 
@@ -149,22 +131,24 @@ namespace WpfApplication.Views {
             if (IsEmpty()) {
                 return new Size(0, 0);
             }
+            
+            var result = new Size(Math.Max(500, arrangeBounds.Width), Math.Max(500, arrangeBounds.Height));
 
-            var itemWidth = arrangeBounds.Width / Columns;
-            var itemHeight = arrangeBounds.Height / Rows;
+            var itemWidth = result.Width / Columns;
+            var itemHeight = result.Height / Rows;
 
             for (byte row = 0; row < Rows; row++) {
                 for (byte col = 0; col < Columns; col++) {
                     var rect = new Rect(col * itemWidth, row * itemHeight, itemWidth, itemHeight);
-                    _buttons[row, col].Arrange(rect);
+                    _cells[row, col].Arrange(rect);
                 }
             }
 
-            return arrangeBounds;
+            return result;
         }
 
         private bool IsEmpty() {
-            return Rows == byte.MinValue || Columns == byte.MinValue || _buttons == null;
+            return Rows == byte.MinValue || Columns == byte.MinValue || _cells == null;
         }
 
         protected override Geometry GetLayoutClip(Size layoutSlotSize) {

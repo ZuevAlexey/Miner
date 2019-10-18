@@ -1,18 +1,14 @@
 namespace Models {
     public class Cell {
-        public Cell(byte row, byte column) {
-            Row = row;
-            Column = column;
+        public Cell(Position position) {
+            Position = position;
         }
 
-        public bool IsMineHere { get; private set; }
-        public byte Row { get; }
-        public byte Column { get; }
-
+        public Position Position { get; }
         public bool IsOpened { get; private set; }
-
+        public bool IsMineHere { get; private set; }
         public byte MineAroundCount { get; set; }
-        public string DisplayString => IsMineHere ? "M" : MineAroundCount.ToString();
+        protected internal string DisplayString => IsMineHere ? "M" : MineAroundCount.ToString();
 
         public virtual bool TryDropMine() {
             if (IsMineHere) {
@@ -24,7 +20,7 @@ namespace Models {
         }
 
         public override string ToString() {
-            return $"[{Row},{Column}] - {DisplayString}";
+            return $"[{Position.Row},{Position.Column}] - {DisplayString}";
         }
 
         public bool TryOpen() {
@@ -47,7 +43,7 @@ namespace Models {
         #region Equals
 
         protected bool Equals(Cell other) {
-            return Row == other.Row && Column == other.Column;
+            return Position.Row == other.Position.Row && Position.Column == other.Position.Column;
         }
 
         public override bool Equals(object obj) {
@@ -64,7 +60,7 @@ namespace Models {
 
         public override int GetHashCode() {
             unchecked {
-                return (Row.GetHashCode() * 397) ^ Column.GetHashCode();
+                return (Position.Row.GetHashCode() * 397) ^ Position.Column.GetHashCode();
             }
         }
 

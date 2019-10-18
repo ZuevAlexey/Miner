@@ -10,7 +10,7 @@ using WpfApplication.Views.Events;
 
 namespace WpfApplication {
     public class Presenter {
-        private static readonly Dictionary<CellState, CellState> _rightClickStateChain =
+        private static readonly Dictionary<CellState, CellState> _rightClickCellStateChain =
             new Dictionary<CellState, CellState> {
                 [CellState.Closed] = CellState.MineHere,
                 [CellState.MineHere] = CellState.Undefined,
@@ -30,7 +30,7 @@ namespace WpfApplication {
             _timerView = timerView;
             _minesCountView = minesCountView;
 
-            _gameManager.OnCellStateChanged += GameManagerCellOpenedEventHandler;
+            _gameManager.OnCellOpened += GameManagerCellOpenedEventHandler;
             _gameManager.OnGameFinished += GameManagerGameFinishedEventHandler;
             _gameManager.OnGameStarted += GameManagerGameStarted;
 
@@ -53,37 +53,36 @@ namespace WpfApplication {
                 return;
             }
 
-            //TODO : брать из ICellView
-//            var curState = _gameManager.GetCellState(args.Row, args.Column);
-            var curState = CellState.Closed;
+            var curState = _matrixView.GetCellState(args.Position);
 
             if (args.Button == MouseButton.Left) {
                 HandleLeftClick(args, curState);
                 return;
             }
 
-            HandleRightClick(curState, args.Row, args.Column);
+            HandleRightClick(curState, args.Position);
         }
 
-        private void HandleRightClick(CellState curState, byte row, byte column) {
-            if (_rightClickStateChain.TryGetValue(curState, out var nextState)) {
-                //TODO: Change IViewCell.State
-                
-                
-                if (nextState == CellState.MineHere) {
-                    _minesCountView.MinesCount--;
-                    return;
-                }
+        private void HandleRightClick(CellState curState, Position position) {
+            if (!_rightClickCellStateChain.TryGetValue(curState, out var nextState)) {
+                return;
+            }
 
-                if (nextState == CellState.MineHere) {
-                    _minesCountView.MinesCount++;
-                }
+            _matrixView.ChangeCellState(position, nextState, false, 0);
+                
+            if (curState == CellState.MineHere) {
+                _minesCountView.MinesCount++;
+                return;
+            }
+
+            if (nextState == CellState.MineHere) {
+                _minesCountView.MinesCount--;
             }
         }
 
         private void HandleLeftClick(OnCellPressedEventHandlerArgs args, CellState curState) {
             if (curState == CellState.Closed) {
-                _gameManager.TryOpen(args.Row, args.Column);
+                _gameManager.TryOpen(args.Position);
             }
         }
 
@@ -98,9 +97,7 @@ namespace WpfApplication {
         }
 
         private void GameManagerCellOpenedEventHandler(object sender, CellOpenedEventHandlerArgs args) {
-            _matrixView.ChangeCellState(args.Row, args.Column, CellState.Opened, args.DisplayString);
-
-            
+            _matrixView.ChangeCellState(args.Position, CellState.Opened, args.IsMineHere, args.MinesAroundCount);
         }
     }
 }
