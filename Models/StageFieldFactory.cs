@@ -9,7 +9,7 @@ namespace Models {
             _miningAlgorithm = miningAlgorithm;
         }
 
-        public virtual Field Create(PlaySettings settings) {
+        public virtual Field Create(GameSettings settings) {
             var result = new Field(settings.Rows, settings.Columns);
             
             BeforeMining(result, settings);
@@ -20,7 +20,7 @@ namespace Models {
             return result;
         }
 
-        protected virtual void AfterMining(Field field, PlaySettings settings) {
+        protected virtual void AfterMining(Field field, GameSettings settings) {
             CalculateMineCount(field);
         }
 
@@ -30,6 +30,6 @@ namespace Models {
             }
         }
 
-        protected virtual void BeforeMining(Field field, PlaySettings settings) { }
+        protected virtual void BeforeMining(Field field, GameSettings settings) { }
     }
 }

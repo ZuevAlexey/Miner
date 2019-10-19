@@ -61,6 +61,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GameManagetTest.cs" />
     <Compile Include="StageFieldFactoryTest.cs" />
     <Compile Include="MiningAlgorithmTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

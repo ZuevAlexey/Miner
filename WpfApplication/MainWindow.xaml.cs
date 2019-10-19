@@ -15,16 +15,11 @@ namespace WpfApplication {
             var gameManager = new GameManager(new StageFieldFactory(new SimpleMiningAlgorithm()));
             gameManager.OnCellOpened += (sender, args) => Debug.WriteLine($"OnCellOpened {args}");
             gameManager.OnGameFinished += (sender, args) => Debug.WriteLine($"GameFinished {args.IsVictory}");
-            gameManager.OnGameStarted += (sender, args) => Debug.WriteLine($"Game Started");
-            
-            
+            gameManager.OnGameStarted += (sender, args) => Debug.WriteLine("Game Started");
+
+
             _presenter = new Presenter(Field, gameManager, mainWindowView, mainWindowView);
-            _presenter.StartGame(new PlaySettings {
-                Columns = 9,
-                Rows = 9,
-                MinesCount = 10,
-                CanOpenMineFirstTry = false
-            });
+            _presenter.StartGame(new GameSettings(9, 9, 10, false));
         }
     }
 }

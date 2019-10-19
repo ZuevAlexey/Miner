@@ -21,7 +21,7 @@ namespace WpfApplication {
         private readonly IMatrixView _matrixView;
         private readonly IMinesCountView _minesCountView;
         private readonly ITimerView _timerView;
-        private PlaySettings _currentSettings;
+        private GameSettings _currentSettings;
 
         public Presenter(IMatrixView matrixView, IGameManager gameManager, ITimerView timerView,
                          IMinesCountView minesCountView) {
@@ -41,7 +41,7 @@ namespace WpfApplication {
             _timerView.Start();
         }
 
-        public async Task StartGame(PlaySettings settings) {
+        public async Task StartGame(GameSettings settings) {
             _currentSettings = settings;
             await Task.Run(() => _gameManager.StartGame(settings));
             _matrixView.CreateField(settings.Rows, settings.Columns);

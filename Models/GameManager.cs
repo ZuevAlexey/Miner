@@ -2,21 +2,20 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.InteropServices;
 using Models.Events;
 using Models.Extension;
 
 namespace Models {
     public class GameManager : IGameManager {
-        private readonly StageFieldFactory _stageFieldFactory;
+        private readonly IFieldFactory _stageFieldFactory;
 
-        private PlaySettings _currentSettings;
+        private GameSettings _currentSettings;
         private Field _field;
         private volatile bool _fieldGenerated;
         private volatile bool _gameFinished;
         private volatile bool _gameStarted;
 
-        public GameManager(StageFieldFactory stageFieldFactory) {
+        public GameManager(IFieldFactory stageFieldFactory) {
             _stageFieldFactory = stageFieldFactory;
         }
 
@@ -24,7 +23,7 @@ namespace Models {
         public event GameFinishedEventHandler OnGameFinished;
         public event GameStartedEventHandler OnGameStarted;
 
-        public async void StartGame(PlaySettings settings) {
+        public async void StartGame(GameSettings settings) {
             _fieldGenerated = false;
             _gameStarted = false;
             _gameFinished = false;

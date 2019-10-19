@@ -16,11 +16,9 @@ namespace Models.Test {
                     for (byte col = 5; col < 10; col++) {
                         var step = Math.Min(row, col);
                         for (var mineCount = 0; mineCount <= row * col; mineCount += step) {
-                            yield return new TestCaseData(new PlaySettings {
-                                Columns = col,
-                                Rows = row,
-                                MinesCount = mineCount
-                            }, factory).SetName($"row = {row}; col = {col}; mineCount = {mineCount}");
+                            yield return
+                                new TestCaseData(new GameSettings(row, col, mineCount, false), factory).SetName(
+                                    $"row = {row}; col = {col}; mineCount = {mineCount}");
                         }
                     }
                 }
@@ -28,7 +26,7 @@ namespace Models.Test {
         }
 
         [TestCaseSource(nameof(PlaySettings))]
-        public void CheckField(PlaySettings settings, IFieldFactory factory) {
+        public void CorrectField(GameSettings settings, IFieldFactory factory) {
             var field = factory.Create(settings);
 
             Assert.That(field.AllCells.Count(e => e.IsMineHere) == settings.MinesCount);
@@ -36,14 +34,10 @@ namespace Models.Test {
         }
 
         [Test]
-        public void CheckUsingMiningAlgorithm() {
+        public void UsingMiningAlgorithm() {
             var algo = new Mock<IMiningAlgorithm>();
             var factory = new StageFieldFactory(algo.Object);
-            var settings = new PlaySettings {
-                Columns = 5,
-                Rows = 2,
-                MinesCount = 2
-            };
+            var settings = new GameSettings(5, 2, 2, false);
 
             var field = factory.Create(settings);
 
