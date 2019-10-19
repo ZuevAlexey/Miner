@@ -12,7 +12,8 @@ namespace Models.Test {
 
                 for (byte row = 5; row < 10; row++) {
                     for (byte col = 5; col < 10; col++) {
-                        for (var mineCount = 0; mineCount <= row * col; mineCount++) {
+                        var step = Math.Min(row, col);
+                        for (var mineCount = 0; mineCount <= row * col; mineCount += step) {
                             yield return new TestCaseData(new PlaySettings {
                                 Columns = col,
                                 Rows = row,
@@ -27,8 +28,6 @@ namespace Models.Test {
         [TestCaseSource(nameof(PlaySettings))]
         public void CheckMineCount(PlaySettings settings, IMiningAlgorithm algo) {
             var field = new Field(settings.Rows, settings.Columns);
-            Assert.That(field.AllCells.Count(e => e.IsMineHere) == 0);
-
             algo.DropMines(field, settings.MinesCount);
 
             Assert.That(field.AllCells.Count(e => e.IsMineHere) == settings.MinesCount);
@@ -49,13 +48,13 @@ namespace Models.Test {
                     Rows = 5,
                     MinesCount = 0
                 }, miningAlgo).SetName("Columns = 0");
-                
+
                 yield return new TestCaseData(new PlaySettings {
                     Columns = 5,
                     Rows = 0,
                     MinesCount = 0
                 }, miningAlgo).SetName("Rows = 0");
-                
+
                 yield return new TestCaseData(new PlaySettings {
                     Columns = 0,
                     Rows = 0,
