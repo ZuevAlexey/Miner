@@ -53,8 +53,8 @@
     <Compile Include="MatrixViewWrapper.cs" />
     <Compile Include="Views\BaseCellView.cs" />
     <Compile Include="Views\CellState.cs" />
-    <Compile Include="Views\Debug\DebugCellView.cs" />
-    <Compile Include="Views\Debug\DebugTitleView.cs" />
+    <Compile Include="Views\DebugCellView.cs" />
+    <Compile Include="Views\DebugTitleView.cs" />
     <Compile Include="Views\Events\OnCellPressedEventHandler.cs" />
     <Compile Include="Views\Events\OnCellPressedEventHandlerArgs.cs" />
     <Compile Include="Views\IMatrixView.cs" />

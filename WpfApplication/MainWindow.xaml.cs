@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using Models;
 using WpfApplication.Views;
-using WpfApplication.Views.Debug;
 
 namespace WpfApplication {
     /// <summary>
