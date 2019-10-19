@@ -6,7 +6,7 @@ using NUnit.Framework;
 namespace Models.Test {
     [TestFixture]
     public class MiningAlgorithmTest {
-        private static IEnumerable PlaySettings {
+        private static IEnumerable CorrectMineCountCaseSource {
             get {
                 var miningAlgo = new SimpleMiningAlgorithm();
 
@@ -22,7 +22,7 @@ namespace Models.Test {
             }
         }
 
-        [TestCaseSource(nameof(PlaySettings))]
+        [TestCaseSource(nameof(CorrectMineCountCaseSource))]
         public void CorrectMineCount(GameSettings settings, IMiningAlgorithm algo) {
             var field = new Field(settings.Rows, settings.Columns);
             algo.DropMines(field, settings.MinesCount);
@@ -30,7 +30,7 @@ namespace Models.Test {
             Assert.That(field.AllCells.Count(e => e.IsMineHere) == settings.MinesCount);
         }
 
-        private static IEnumerable BadSettings {
+        private static IEnumerable BadSettingsExceptionCaseSource {
             get {
                 var miningAlgo = new SimpleMiningAlgorithm();
 
@@ -46,7 +46,7 @@ namespace Models.Test {
             }
         }
 
-        [TestCaseSource(nameof(BadSettings))]
+        [TestCaseSource(nameof(BadSettingsExceptionCaseSource))]
         public void BadSettingsException(GameSettings settings, IMiningAlgorithm algo) {
             var field = new Field(settings.Rows, settings.Columns);
 

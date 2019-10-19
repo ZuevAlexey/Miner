@@ -11,7 +11,7 @@ namespace Models {
             if (field.Size <= 0) {
                 throw new ArgumentException("The field must not be empty");
             }
-            
+
             if (minesCount > field.Size) {
                 throw new ArgumentException("The number of mines must be less than the size of the field");
             }

@@ -30,7 +30,7 @@ namespace Models {
 
             _currentSettings = settings;
             _field = _stageFieldFactory.Create(_currentSettings);
-            
+
             _fieldGenerated = true;
         }
 
@@ -54,7 +54,9 @@ namespace Models {
 
             if (IsBoom(cell)) {
                 _gameFinished = true;
-                OnGameFinished?.Invoke(this, new GameFinishedEventHandlerArgs(false, _field.AllCells.Where(e => e.IsMineHere).Select(e => e.Position).ToList()));
+                OnGameFinished?.Invoke(this,
+                    new GameFinishedEventHandlerArgs(false,
+                        _field.AllCells.Where(e => e.IsMineHere).Select(e => e.Position).ToList()));
                 return;
             }
 
@@ -111,7 +113,8 @@ namespace Models {
                     if (cell.IsOpened) {
                         return false;
                     }
-                } else {
+                }
+                else {
                     if (!cell.IsOpened) {
                         return false;
                     }
@@ -127,7 +130,7 @@ namespace Models {
                 OnCellOpened?.Invoke(this,
                     new CellOpenedEventHandlerArgs(cell.Position, cell.IsMineHere, cell.MineAroundCount));
             }
-            
+
             return changeStateResult;
         }
 
@@ -139,7 +142,7 @@ namespace Models {
             var alreadyProcessed = new HashSet<Cell> {
                 cell
             };
-            var needToProcess = new Stack<Cell>(GetNotOpenedAndNotProcessedNeighbors(cell, null));
+            var needToProcess = new Stack<Cell>(GetNotOpenedAndNotProcessedNeighbors(cell));
             while (needToProcess.Count > 0) {
                 var curCell = needToProcess.Pop();
                 if (alreadyProcessed.Contains(curCell)) {
@@ -162,7 +165,8 @@ namespace Models {
             }
         }
 
-        private IEnumerable<Cell> GetNotOpenedAndNotProcessedNeighbors(Cell curCell, HashSet<Cell> alreadyProcessed = null) {
+        private IEnumerable<Cell> GetNotOpenedAndNotProcessedNeighbors(Cell curCell,
+                                                                       HashSet<Cell> alreadyProcessed = null) {
             return _field.GetNeighbors(curCell).Where(e => !e.IsOpened && !(alreadyProcessed?.Contains(e) ?? false));
         }
 

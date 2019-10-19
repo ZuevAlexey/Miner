@@ -69,7 +69,7 @@ namespace WpfApplication {
             }
 
             _matrixView.ChangeCellState(position, nextState, false, 0);
-                
+
             if (curState == CellState.MineHere) {
                 _minesCountView.MinesCount++;
                 return;
@@ -93,7 +93,7 @@ namespace WpfApplication {
                     _matrixView.ChangeCellState(position, CellState.Opened, true, 0);
                 }
             }
-            
+
             var playAgain = MessageBox.Show(Application.Current.MainWindow,
                 args.IsVictory ? "Game Victory! Play again?" : "You loser! Play again?", "Game Result",
                 MessageBoxButton.YesNo);

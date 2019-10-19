@@ -13,7 +13,7 @@ namespace Models {
                     _cells[i, j] = new Cell(new Position(i, j));
                 }
             }
-            
+
             Columns = columns;
             Rows = rows;
         }

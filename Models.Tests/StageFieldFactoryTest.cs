@@ -7,7 +7,7 @@ using NUnit.Framework;
 namespace Models.Test {
     [TestFixture]
     public class StageFieldFactoryTest {
-        private static IEnumerable PlaySettings {
+        private static IEnumerable CorrectFieldCaseSource {
             get {
                 var factory = new StageFieldFactory(new SimpleMiningAlgorithm());
 
@@ -24,7 +24,7 @@ namespace Models.Test {
             }
         }
 
-        [TestCaseSource(nameof(PlaySettings))]
+        [TestCaseSource(nameof(CorrectFieldCaseSource))]
         public void CorrectField(GameSettings settings, IFieldFactory factory) {
             var field = factory.Create(settings);
 

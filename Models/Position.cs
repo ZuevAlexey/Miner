@@ -4,6 +4,7 @@ namespace Models {
             Row = row;
             Column = column;
         }
+
         public byte Row { get; }
         public byte Column { get; }
 
@@ -20,7 +21,7 @@ namespace Models {
                 return true;
             }
 
-            if (obj.GetType() != this.GetType()) {
+            if (obj.GetType() != GetType()) {
                 return false;
             }
 

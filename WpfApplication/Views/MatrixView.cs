@@ -1,14 +1,12 @@
 using System;
-using System.ComponentModel;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Models;
 using WpfApplication.Views.Events;
 
 namespace WpfApplication.Views {
-    public class MatrixView<T> : FrameworkElement, IMatrixView where T:BaseCellView, new() {
+    public class MatrixView<T> : FrameworkElement, IMatrixView where T : BaseCellView, new() {
         /// <summary>Rows Dependency Property</summary>
         public static readonly DependencyProperty RowsProperty =
             DependencyProperty.Register(
@@ -68,7 +66,7 @@ namespace WpfApplication.Views {
 
                 return;
             }
-            
+
             if (_cells != null) {
                 foreach (var button in _cells) {
                     RemoveVisualChild(button);
@@ -76,7 +74,7 @@ namespace WpfApplication.Views {
             }
 
             _cells = new BaseCellView[rows, columns];
-            
+
             for (byte row = 0; row < rows; row++) {
                 for (byte col = 0; col < columns; col++) {
                     var cell = new T {
@@ -99,7 +97,7 @@ namespace WpfApplication.Views {
         }
 
         private void CellPreviewMouseDownEventHandler(object sender, MouseButtonEventArgs args) {
-            var cell = (sender as T);
+            var cell = sender as T;
             OnCellPressed?.Invoke(this, new OnCellPressedEventHandlerArgs(cell.Position, args.ChangedButton));
         }
 
@@ -121,9 +119,9 @@ namespace WpfApplication.Views {
 
         protected override Size MeasureOverride(Size constraint) {
             if (constraint.Width < 50 || constraint.Height < 50) {
-                return new Size(50, 50); 
+                return new Size(50, 50);
             }
-            
+
             return constraint;
         }
 
@@ -131,7 +129,7 @@ namespace WpfApplication.Views {
             if (IsEmpty()) {
                 return new Size(0, 0);
             }
-            
+
             var result = new Size(Math.Max(500, arrangeBounds.Width), Math.Max(500, arrangeBounds.Height));
 
             var itemWidth = result.Width / Columns;

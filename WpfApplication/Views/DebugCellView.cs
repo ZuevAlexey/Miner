@@ -7,7 +7,7 @@ using Models;
 namespace WpfApplication.Views {
     public class DebugCellView : BaseCellView {
         private static readonly Brush _defaultBrush = Brushes.Cornsilk;
-      
+
         private Brush _brush = _defaultBrush;
         private string _content = "";
 
@@ -22,11 +22,11 @@ namespace WpfApplication.Views {
                 FlowDirection.LeftToRight,
                 new Typeface("Times new roman"),
                 21,
-                Brushes.Black, VisualTreeHelper.GetDpi(this).PixelsPerDip) ;
+                Brushes.Black, VisualTreeHelper.GetDpi(this).PixelsPerDip);
 
-            var textLocation = new Point(ActualWidth / 2 - formattedText.WidthIncludingTrailingWhitespace / 2, ActualHeight / 2 - formattedText.Height / 2);
+            var textLocation = new Point(ActualWidth / 2 - formattedText.WidthIncludingTrailingWhitespace / 2,
+                ActualHeight / 2 - formattedText.Height / 2);
             drawingContext.DrawText(formattedText, textLocation);
-            
         }
 
         protected override void OnStateChangedInternal() {

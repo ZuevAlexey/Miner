@@ -45,6 +45,104 @@ namespace Models.Test {
             Assert.That(lastGameResult == gameResult);
         }
 
+        private static IEnumerable ChainOpeningEmptyCellsCaseSource {
+            get {
+                var firstEmptyCells = new List<Position> {
+                    new Position(0, 0),
+                    new Position(0, 1),
+                    new Position(0, 2),
+                    new Position(1, 2),
+                    new Position(2, 2)
+                };
+
+                var fistChain = firstEmptyCells.Union(new List<Position> {
+                    new Position(0, 3),
+                    new Position(1, 0),
+                    new Position(1, 1),
+                    new Position(1, 3),
+                    new Position(2, 1),
+                    new Position(2, 3),
+                    new Position(3, 1),
+                    new Position(3, 2),
+                    new Position(3, 3)
+                }).ToList();
+
+                foreach (var position in firstEmptyCells) {
+                    yield return new TestCaseData(CreateFieldTwo(), position, new HashSet<Position>(fistChain))
+                        .SetName($"Chain 1 - ({position.Row}, {position.Column})");
+                }
+
+                var secondEmptyCells = new List<Position> {
+                    new Position(3, 4),
+                    new Position(4, 4)
+                };
+
+                var secondChain = secondEmptyCells.Union(new List<Position> {
+                    new Position(2, 3),
+                    new Position(2, 4),
+                    new Position(3, 3),
+                    new Position(4, 3)
+                }).ToList();
+
+                foreach (var position in secondEmptyCells) {
+                    yield return new TestCaseData(CreateFieldTwo(), position, new HashSet<Position>(secondChain))
+                        .SetName($"Chain 2 - ({position.Row}, {position.Column})");
+                }
+            }
+        }
+
+        [TestCaseSource(nameof(ChainOpeningEmptyCellsCaseSource))]
+        public void ChainOpeningEmptyCells(Field field, Position move, HashSet<Position> expectedOpenedCells) {
+            var factory = CreateFactory(field);
+            var manager = new GameManager(factory.Object);
+            manager.OnCellOpened += (sender, args) => {
+                Assert.That(expectedOpenedCells.Contains(args.Position));
+                Assert.That(!args.IsMineHere);
+                expectedOpenedCells.Remove(args.Position);
+            };
+
+            manager.StartGame(CreateUnusedSettings());
+            manager.TryOpen(move);
+
+            Assert.That(expectedOpenedCells.Count == 0);
+        }
+
+        private static IEnumerable FirstTryOpenMineCaseSource {
+            get {
+                var minePositions = new[] {
+                    new Position(0, 2),
+                    new Position(1, 1),
+                    new Position(2, 0),
+                    new Position(2, 1)
+                };
+
+                var canOpenMineFirstTrySettings = new GameSettings(3, 3, 4, true);
+                var canNotOpenMineFirstTrySettings = new GameSettings(3, 3, 4, false);
+
+                foreach (var minePosition in minePositions) {
+                    yield return new TestCaseData(CreateFieldOne(), minePosition, canOpenMineFirstTrySettings, false)
+                        .SetName($"Swap mine - ({minePosition.Row}, {minePosition.Column})");
+
+                    yield return new TestCaseData(CreateFieldOne(), minePosition, canNotOpenMineFirstTrySettings, null)
+                        .SetName($"Lose - ({minePosition.Row}, {minePosition.Column})");
+                }
+            }
+        }
+
+        [TestCaseSource(nameof(FirstTryOpenMineCaseSource))]
+        public void FirstTryOpenMine(Field field, Position move, GameSettings settings, bool? expectedGameResult) {
+            var factory = CreateFactory(field);
+            var manager = new GameManager(factory.Object);
+
+            bool? gameResult = null;
+            manager.OnGameFinished += (sender, args) => { gameResult = args.IsVictory; };
+
+            manager.StartGame(settings);
+            manager.TryOpen(move);
+
+            Assert.That(gameResult == expectedGameResult);
+        }
+
         [Test]
         public void GameFinishedException() {
             var factory = new Mock<IFieldFactory>();
@@ -90,104 +188,6 @@ namespace Models.Test {
             factory.Verify(e => e.Create(It.Is<GameSettings>(s => s == settings)), Times.Once);
         }
         
-        private static IEnumerable ChainOpeningEmptyCellsCaseSource {
-            get {
-                var firstEmptyCells = new List<Position> {
-                    new Position(0, 0),
-                    new Position(0, 1),
-                    new Position(0, 2),
-                    new Position(1, 2),
-                    new Position(2, 2)
-                };
-
-                var fistChain = firstEmptyCells.Union(new List<Position> {
-                    new Position(0, 3),
-                    new Position(1, 0),
-                    new Position(1, 1),
-                    new Position(1, 3),
-                    new Position(2, 1),
-                    new Position(2, 3),
-                    new Position(3, 1),
-                    new Position(3, 2),
-                    new Position(3, 3),
-                }).ToList();
-
-                foreach (var position in firstEmptyCells) {
-                    yield return new TestCaseData(CreateFieldTwo(), position, new HashSet<Position>(fistChain))
-                        .SetName($"Chain 1 - ({position.Row}, {position.Column})");
-                }
-
-                var secondEmptyCells = new List<Position> {
-                    new Position(3, 4),
-                    new Position(4, 4)
-                };
-
-                var secondChain = secondEmptyCells.Union(new List<Position> {
-                    new Position(2, 3),
-                    new Position(2, 4),
-                    new Position(3, 3),
-                    new Position(4, 3)
-                }).ToList();
-            
-                foreach (var position in secondEmptyCells) {
-                    yield return new TestCaseData(CreateFieldTwo(), position, new HashSet<Position>(secondChain))
-                        .SetName($"Chain 2 - ({position.Row}, {position.Column})");
-                }
-            }
-        }
-        
-        [TestCaseSource(nameof(ChainOpeningEmptyCellsCaseSource))]
-        public void ChainOpeningEmptyCells(Field field, Position move, HashSet<Position> expectedOpenedCells) {
-            var factory = CreateFactory(field);
-            var manager = new GameManager(factory.Object);
-            manager.OnCellOpened += (sender, args) => {
-                Assert.That(expectedOpenedCells.Contains(args.Position));
-                Assert.That(!args.IsMineHere);
-                expectedOpenedCells.Remove(args.Position);
-            };
-            
-            manager.StartGame(CreateUnusedSettings());
-            manager.TryOpen(move);
-            
-            Assert.That(expectedOpenedCells.Count == 0);
-        }
-        
-        private static IEnumerable FirstTryOpenMineCaseSource {
-            get {
-                var minePositions = new[] {
-                    new Position(0, 2),
-                    new Position(1, 1),
-                    new Position(2, 0),
-                    new Position(2, 1)
-                };
-                
-                var canOpenMineFirstTrySettings = new GameSettings(3, 3, 4, true);
-                var canNotOpenMineFirstTrySettings = new GameSettings(3, 3, 4, false);
-
-                foreach (var minePosition in minePositions) {
-                    yield return new TestCaseData(CreateFieldOne(), minePosition, canOpenMineFirstTrySettings, false)
-                        .SetName($"Swap mine - ({minePosition.Row}, {minePosition.Column})");
-
-                    yield return new TestCaseData(CreateFieldOne(), minePosition, canNotOpenMineFirstTrySettings, null)
-                        .SetName($"Lose - ({minePosition.Row}, {minePosition.Column})");
-                }
-            }
-        }
-        
-        [TestCaseSource(nameof(FirstTryOpenMineCaseSource))]
-        public void FirstTryOpenMine(Field field, Position move, GameSettings settings, bool? expectedGameResult) {
-            var factory = CreateFactory(field);
-            var manager = new GameManager(factory.Object);
-
-            bool? gameResult = null;
-            manager.OnGameFinished += (sender, args) => { gameResult = args.IsVictory; };
-            
-            manager.StartGame(settings);
-            manager.TryOpen(move);
-            
-            Assert.That(gameResult == expectedGameResult);
-        }
-
         private static GameSettings CreateUnusedSettings() {
             return new GameSettings(1, 1, 1, false);
         }
@@ -217,7 +217,7 @@ namespace Models.Test {
             result.RecalculateMinesAroundCount();
             return result;
         }
-        
+
         /// <summary>
         ///     Create test field
         ///     0    0    0    2    M
@@ -238,7 +238,7 @@ namespace Models.Test {
             result.RecalculateMinesAroundCount();
             return result;
         }
-        
+
         private static Mock<IFieldFactory> CreateFactory(Field field) {
             var factory = new Mock<IFieldFactory>();
             factory.Setup(e => e.Create(It.IsAny<GameSettings>())).Returns(field);

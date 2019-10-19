@@ -11,7 +11,7 @@ namespace Models {
 
         public virtual Field Create(GameSettings settings) {
             var result = new Field(settings.Rows, settings.Columns);
-            
+
             BeforeMining(result, settings);
             _miningAlgorithm.DropMines(result, settings.MinesCount);
             AfterMining(result, settings);
