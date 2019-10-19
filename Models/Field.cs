@@ -8,6 +8,12 @@ namespace Models {
 
         public Field(byte rows, byte columns) {
             _cells = new Cell[rows, columns];
+            for (byte i = 0; i < rows; i++) {
+                for (byte j = 0; j < columns; j++) {
+                    _cells[i, j] = new Cell(new Position(i, j));
+                }
+            }
+            
             Columns = columns;
             Rows = rows;
         }
@@ -18,13 +24,10 @@ namespace Models {
 
         public virtual Cell this[Position position] {
             get => _cells[position.Row, position.Column];
-            protected internal set => _cells[position.Row, position.Column] = value;
+            protected set => _cells[position.Row, position.Column] = value;
         }
 
-        public virtual Cell this[int index] {
-            get => _cells[index / Columns, index % Columns];
-            protected internal set => _cells[index / Columns, index % Columns] = value;
-        }
+        public virtual Cell this[int index] => _cells[index / Columns, index % Columns];
 
         public IEnumerable<Cell> AllCells {
             get {

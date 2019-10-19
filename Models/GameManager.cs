@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Models.Events;
+using Models.Extension;
 
 namespace Models {
     public class GameManager : IGameManager {
-        private readonly FieldFactory _fieldFactory;
+        private readonly StageFieldFactory _stageFieldFactory;
 
         private PlaySettings _currentSettings;
         private Field _field;
@@ -14,8 +16,8 @@ namespace Models {
         private volatile bool _gameFinished;
         private volatile bool _gameStarted;
 
-        public GameManager(FieldFactory fieldFactory) {
-            _fieldFactory = fieldFactory;
+        public GameManager(StageFieldFactory stageFieldFactory) {
+            _stageFieldFactory = stageFieldFactory;
         }
 
         public event CellOpenedEventHandler OnCellOpened;
@@ -28,7 +30,7 @@ namespace Models {
             _gameFinished = false;
 
             _currentSettings = settings;
-            _field = _fieldFactory.Create(_currentSettings);
+            _field = _stageFieldFactory.Create(_currentSettings);
             
             _fieldGenerated = true;
         }
@@ -92,7 +94,7 @@ namespace Models {
 
         private void RecalculateMinesCount(IEnumerable<Cell> cells) {
             foreach (var recalculatedCell in cells.SelectMany(cell => _field.GetNeighbors(cell))) {
-                FieldFactory.CalculateMineCount(_field, recalculatedCell);
+                recalculatedCell.MineAroundCount = _field.GetMinesAroundCount(recalculatedCell);
             }
         }
 

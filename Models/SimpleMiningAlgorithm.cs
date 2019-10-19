@@ -7,13 +7,17 @@ namespace Models {
     public class SimpleMiningAlgorithm : IMiningAlgorithm {
         private static readonly Random _random = new Random();
 
-        public void DropMines(Field field, PlaySettings settings) {
-            if (settings.MineCount > field.Size) {
-                throw new ArgumentException("Count of mines must be a less than field.Size");
+        public void DropMines(Field field, int minesCount) {
+            if (field.Size <= 0) {
+                throw new ArgumentException("The field must not be empty");
+            }
+            
+            if (minesCount > field.Size) {
+                throw new ArgumentException("The number of mines must be less than the size of the field");
             }
 
             var currentMineCount = 0;
-            while (currentMineCount < settings.MineCount) {
+            while (currentMineCount < minesCount) {
                 var newMineIndex = _random.Next(0, field.Size);
                 if (field[newMineIndex].TryDropMine()) {
                     currentMineCount++;

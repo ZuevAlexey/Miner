@@ -7,6 +7,5 @@
         xmlns:debug="clr-namespace:WpfApplication.Views.Debug"
         mc:Ignorable="d"
         Title="MainWindow" Height="540" Width="525">
-    <wpfApplication:MatrixViewWrapper x:Name="Field" Rows="5" Columns="5" />
-    <!-- <debug:DebugCellView x:Name="TestCell" /> -->
+    <wpfApplication:MatrixViewWrapper x:Name="Field" />
 </Window>

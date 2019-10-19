@@ -45,7 +45,7 @@ namespace WpfApplication {
             _currentSettings = settings;
             await Task.Run(() => _gameManager.StartGame(settings));
             _matrixView.CreateField(settings.Rows, settings.Columns);
-            _minesCountView.MinesCount = settings.MineCount;
+            _minesCountView.MinesCount = settings.MinesCount;
         }
 
         private void MatrixViewCellPressedEventHandler(object sender, OnCellPressedEventHandlerArgs args) {

@@ -1,25 +1,19 @@
 using System.Diagnostics;
-using System.Linq;
+using Models.Extension;
 
 namespace Models {
-    public class FieldFactory {
+    public class StageFieldFactory : IFieldFactory {
         private readonly IMiningAlgorithm _miningAlgorithm;
 
-        public FieldFactory(IMiningAlgorithm miningAlgorithm) {
+        public StageFieldFactory(IMiningAlgorithm miningAlgorithm) {
             _miningAlgorithm = miningAlgorithm;
         }
 
         public virtual Field Create(PlaySettings settings) {
             var result = new Field(settings.Rows, settings.Columns);
-            for (byte i = 0; i < result.Rows; i++) {
-                for (byte j = 0; j < result.Columns; j++) {
-                    var position = new Position(i, j);
-                    result[position] = new Cell(position);
-                }
-            }
-
+            
             BeforeMining(result, settings);
-            _miningAlgorithm.DropMines(result, settings);
+            _miningAlgorithm.DropMines(result, settings.MinesCount);
             AfterMining(result, settings);
 
             Debug.WriteLine(result.ToString());
@@ -32,13 +26,8 @@ namespace Models {
 
         protected void CalculateMineCount(Field field) {
             foreach (var cell in field.AllCells) {
-                CalculateMineCount(field, cell);
+                cell.MineAroundCount = field.GetMinesAroundCount(cell);
             }
-        }
-
-        public static void CalculateMineCount(Field field, Cell cell) {
-            var neighbors = field.GetNeighbors(cell).ToList();
-            cell.MineAroundCount = (byte) neighbors.Count(e => e.IsMineHere);
         }
 
         protected virtual void BeforeMining(Field field, PlaySettings settings) { }

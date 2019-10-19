@@ -1,5 +1,5 @@
 namespace Models {
     public interface IMiningAlgorithm {
-        void DropMines(Field field, PlaySettings settings);
+        void DropMines(Field field, int minesCount);
     }
 }
