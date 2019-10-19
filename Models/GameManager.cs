@@ -68,7 +68,11 @@ namespace Models {
         }
 
         private void SwapMine(ref Cell cell) {
-            var targetCell = _field.AllCells.First(e => !e.IsMineHere);
+            var targetCell = _field.AllCells.FirstOrDefault(e => !e.IsMineHere);
+
+            if (targetCell == null) {
+                return;
+            }
 
             var newOpenedCell = new Cell(cell.Position) {
                 MineAroundCount = cell.MineAroundCount

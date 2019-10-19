@@ -21,13 +21,7 @@ namespace Models {
         }
 
         protected virtual void AfterMining(Field field, GameSettings settings) {
-            CalculateMineCount(field);
-        }
-
-        protected void CalculateMineCount(Field field) {
-            foreach (var cell in field.AllCells) {
-                cell.MineAroundCount = field.GetMinesAroundCount(cell);
-            }
+            field.RecalculateMinesAroundCount();
         }
 
         protected virtual void BeforeMining(Field field, GameSettings settings) { }

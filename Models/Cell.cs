@@ -43,7 +43,7 @@ namespace Models {
         #region Equals
 
         protected bool Equals(Cell other) {
-            return Position.Row == other.Position.Row && Position.Column == other.Position.Column;
+            return Position.Equals(other.Position);
         }
 
         public override bool Equals(object obj) {
@@ -59,9 +59,7 @@ namespace Models {
         }
 
         public override int GetHashCode() {
-            unchecked {
-                return (Position.Row.GetHashCode() * 397) ^ Position.Column.GetHashCode();
-            }
+            return Position.GetHashCode();
         }
 
         #endregion

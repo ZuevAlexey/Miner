@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Linq;
-using Models.Extension;
 using Moq;
 using NUnit.Framework;
 
@@ -30,7 +29,7 @@ namespace Models.Test {
             var field = factory.Create(settings);
 
             Assert.That(field.AllCells.Count(e => e.IsMineHere) == settings.MinesCount);
-            Assert.That(field.AllCells.All(e => e.MineAroundCount == field.GetMinesAroundCount(e)));
+            Assert.That(field.AllCells.All(e => e.MineAroundCount == field.GetNeighbors(e).Count(m => m.IsMineHere)));
         }
 
         [Test]
