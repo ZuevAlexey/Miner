@@ -17,7 +17,7 @@ namespace Models.Test {
                 var losingMoves = GetWinStepsFieldOne()
                                   .Take(4)
                                   //add lose step
-                                  .Union(new[] {new Position(1, 1)});
+                                  .Union(new[] { new Position(1, 1) });
                 yield return new TestCaseData(losingMoves, CreateFieldOne(), false)
                     .SetName("Lose on last move");
             }
@@ -25,7 +25,8 @@ namespace Models.Test {
 
         [TestCaseSource(nameof(RaiseGameFinishedOnceTestCaseSource))]
         public void RaiseGameFinishedOnceAtRightTimeWithRightResult(IEnumerable<Position> moves,
-                                                                    Field field, bool gameResult) {
+            Field field,
+            bool gameResult) {
             var factory = CreateFactory(field);
             var manager = new GameManager(factory.Object);
             var gameFinishedCount = 0;
@@ -36,7 +37,7 @@ namespace Models.Test {
             };
 
             manager.StartGame(CreateUnusedSettings());
-            foreach (var move in moves) {
+            foreach(var move in moves) {
                 Assert.That(gameFinishedCount == 0);
                 manager.TryOpen(move);
             }
@@ -67,7 +68,7 @@ namespace Models.Test {
                     new Position(3, 3)
                 }).ToList();
 
-                foreach (var position in firstEmptyCells) {
+                foreach(var position in firstEmptyCells) {
                     yield return new TestCaseData(CreateFieldTwo(), position, new HashSet<Position>(fistChain))
                         .SetName($"Chain 1 - ({position.Row}, {position.Column})");
                 }
@@ -84,7 +85,7 @@ namespace Models.Test {
                     new Position(4, 3)
                 }).ToList();
 
-                foreach (var position in secondEmptyCells) {
+                foreach(var position in secondEmptyCells) {
                     yield return new TestCaseData(CreateFieldTwo(), position, new HashSet<Position>(secondChain))
                         .SetName($"Chain 2 - ({position.Row}, {position.Column})");
                 }
@@ -119,7 +120,7 @@ namespace Models.Test {
                 var canOpenMineFirstTrySettings = new GameSettings(3, 3, 4, true);
                 var canNotOpenMineFirstTrySettings = new GameSettings(3, 3, 4, false);
 
-                foreach (var minePosition in minePositions) {
+                foreach(var minePosition in minePositions) {
                     yield return new TestCaseData(CreateFieldOne(), minePosition, canOpenMineFirstTrySettings, false)
                         .SetName($"Swap mine - ({minePosition.Row}, {minePosition.Column})");
 
@@ -143,51 +144,6 @@ namespace Models.Test {
             Assert.That(gameResult == expectedGameResult);
         }
 
-        [Test]
-        public void GameFinishedException() {
-            var factory = new Mock<IFieldFactory>();
-            factory.Setup(e => e.Create(It.IsAny<GameSettings>()))
-                   .Returns(new Field(2, 2));
-            var manager = new GameManager(new StageFieldFactory(new SimpleMiningAlgorithm()));
-            manager.StartGame(CreateUnusedSettings());
-            manager.TryOpen(new Position(0, 0));
-
-            Assert.Throws<InvalidOperationException>(() => manager.TryOpen(new Position(0, 0)));
-        }
-
-        [Test]
-        public void GameStartedRaisedOnceAtRightTime() {
-            var factory = CreateFactory(CreateFieldOne());
-            var manager = new GameManager(factory.Object);
-            var gameStartedCount = 0;
-            manager.OnGameStarted += (sender, args) => { gameStartedCount++; };
-
-            manager.StartGame(CreateUnusedSettings());
-            foreach (var position in GetWinStepsFieldOne()) {
-                manager.TryOpen(position);
-                Assert.That(gameStartedCount == 1);
-            }
-        }
-
-        [Test]
-        public void RaiseNotStartedGameException() {
-            var manager = new GameManager(new StageFieldFactory(new SimpleMiningAlgorithm()));
-
-
-            Assert.Throws<InvalidOperationException>(() => manager.TryOpen(new Position(0, 0)));
-        }
-
-        [Test]
-        public void UsingFieldFactory() {
-            var factory = new Mock<IFieldFactory>();
-            var manager = new GameManager(factory.Object);
-            var settings = new GameSettings(1, 1, 1, false);
-
-            manager.StartGame(settings);
-
-            factory.Verify(e => e.Create(It.Is<GameSettings>(s => s == settings)), Times.Once);
-        }
-        
         private static GameSettings CreateUnusedSettings() {
             return new GameSettings(1, 1, 1, false);
         }
@@ -243,6 +199,51 @@ namespace Models.Test {
             var factory = new Mock<IFieldFactory>();
             factory.Setup(e => e.Create(It.IsAny<GameSettings>())).Returns(field);
             return factory;
+        }
+
+        [Test]
+        public void GameFinishedException() {
+            var factory = new Mock<IFieldFactory>();
+            factory.Setup(e => e.Create(It.IsAny<GameSettings>()))
+                   .Returns(new Field(2, 2));
+            var manager = new GameManager(new StageFieldFactory(new SimpleMiningAlgorithm()));
+            manager.StartGame(CreateUnusedSettings());
+            manager.TryOpen(new Position(0, 0));
+
+            Assert.Throws<InvalidOperationException>(() => manager.TryOpen(new Position(0, 0)));
+        }
+
+        [Test]
+        public void GameStartedRaisedOnceAtRightTime() {
+            var factory = CreateFactory(CreateFieldOne());
+            var manager = new GameManager(factory.Object);
+            var gameStartedCount = 0;
+            manager.OnGameStarted += (sender, args) => { gameStartedCount++; };
+
+            manager.StartGame(CreateUnusedSettings());
+            foreach(var position in GetWinStepsFieldOne()) {
+                manager.TryOpen(position);
+                Assert.That(gameStartedCount == 1);
+            }
+        }
+
+        [Test]
+        public void RaiseNotStartedGameException() {
+            var manager = new GameManager(new StageFieldFactory(new SimpleMiningAlgorithm()));
+
+
+            Assert.Throws<InvalidOperationException>(() => manager.TryOpen(new Position(0, 0)));
+        }
+
+        [Test]
+        public void UsingFieldFactory() {
+            var factory = new Mock<IFieldFactory>();
+            var manager = new GameManager(factory.Object);
+            var settings = new GameSettings(1, 1, 1, false);
+
+            manager.StartGame(settings);
+
+            factory.Verify(e => e.Create(It.Is<GameSettings>(s => s == settings)), Times.Once);
         }
     }
 }

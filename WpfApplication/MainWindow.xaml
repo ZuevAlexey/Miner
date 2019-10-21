@@ -9,20 +9,23 @@
         mc:Ignorable="d"
         Title="MainWindow" SizeToContent="WidthAndHeight" ResizeMode="CanMinimize">
     <Window.CommandBindings>
-        <CommandBinding Command="wpfApplication:Commands.StartNewGame" Executed="StartNewGame_Executed"/>
-        <CommandBinding Command="wpfApplication:Commands.ChangeComplexity" Executed="ChangeComplexity_Executed"/>
+        <CommandBinding Command="wpfApplication:Commands.StartNewGame" Executed="StartNewGame_Executed" />
+        <CommandBinding Command="wpfApplication:Commands.ChangeComplexity" Executed="ChangeComplexity_Executed" />
     </Window.CommandBindings>
     <Window.InputBindings>
-        <KeyBinding Command="wpfApplication:Commands.StartNewGame" Key="F2"></KeyBinding>
+        <KeyBinding Command="wpfApplication:Commands.StartNewGame" Key="F2" />
     </Window.InputBindings>
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="Options">
                 <MenuItem Header="New Game (F2)" Command="wpfApplication:Commands.StartNewGame" />
                 <MenuItem Header="Complexity">
-                    <MenuItem Header="Easy" Command="wpfApplication:Commands.ChangeComplexity" CommandParameter="{x:Static wpfApplicationSettings:Complexity.Easy}"/>
-                    <MenuItem Header="Medium" Command="wpfApplication:Commands.ChangeComplexity" CommandParameter="{x:Static wpfApplicationSettings:Complexity.Medium}"/>
-                    <MenuItem Header="Hard" Command="wpfApplication:Commands.ChangeComplexity" CommandParameter="{x:Static wpfApplicationSettings:Complexity.Hard}"/>
+                    <MenuItem Header="Easy" Command="wpfApplication:Commands.ChangeComplexity"
+                              CommandParameter="{x:Static wpfApplicationSettings:Complexity.Easy}" />
+                    <MenuItem Header="Medium" Command="wpfApplication:Commands.ChangeComplexity"
+                              CommandParameter="{x:Static wpfApplicationSettings:Complexity.Medium}" />
+                    <MenuItem Header="Hard" Command="wpfApplication:Commands.ChangeComplexity"
+                              CommandParameter="{x:Static wpfApplicationSettings:Complexity.Hard}" />
                 </MenuItem>
             </MenuItem>
 

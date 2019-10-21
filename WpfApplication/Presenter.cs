@@ -23,8 +23,10 @@ namespace WpfApplication {
         private readonly ITimerView _timerView;
         private GameSettings _currentSettings;
 
-        public Presenter(IMatrixView matrixView, IGameManager gameManager, ITimerView timerView,
-                         IMinesCountView minesCountView) {
+        public Presenter(IMatrixView matrixView,
+            IGameManager gameManager,
+            ITimerView timerView,
+            IMinesCountView minesCountView) {
             _matrixView = matrixView;
             _gameManager = gameManager;
             _timerView = timerView;
@@ -49,13 +51,13 @@ namespace WpfApplication {
         }
 
         private void MatrixViewCellPressedEventHandler(object sender, OnCellPressedEventHandlerArgs args) {
-            if (args.Button != MouseButton.Left && args.Button != MouseButton.Right) {
+            if(args.Button != MouseButton.Left && args.Button != MouseButton.Right) {
                 return;
             }
 
             var curState = _matrixView.GetCellState(args.Position);
 
-            if (args.Button == MouseButton.Left) {
+            if(args.Button == MouseButton.Left) {
                 HandleLeftClick(args, curState);
                 return;
             }
@@ -64,32 +66,32 @@ namespace WpfApplication {
         }
 
         private void HandleRightClick(CellState curState, Position position) {
-            if (!_rightClickCellStateChain.TryGetValue(curState, out var nextState)) {
+            if(!_rightClickCellStateChain.TryGetValue(curState, out var nextState)) {
                 return;
             }
 
             _matrixView.ChangeCellState(position, nextState, false, 0);
 
-            if (curState == CellState.MineHere) {
+            if(curState == CellState.MineHere) {
                 _minesCountView.MinesCount++;
                 return;
             }
 
-            if (nextState == CellState.MineHere) {
+            if(nextState == CellState.MineHere) {
                 _minesCountView.MinesCount--;
             }
         }
 
         private void HandleLeftClick(OnCellPressedEventHandlerArgs args, CellState curState) {
-            if (curState == CellState.Closed) {
+            if(curState == CellState.Closed) {
                 _gameManager.TryOpen(args.Position);
             }
         }
 
         private void GameManagerGameFinishedEventHandler(object sender, GameFinishedEventHandlerArgs args) {
             _timerView.Stop();
-            if (args.MinePositions != null) {
-                foreach (var position in args.MinePositions) {
+            if(args.MinePositions != null) {
+                foreach(var position in args.MinePositions) {
                     _matrixView.ChangeCellState(position, CellState.Opened, true, 0);
                 }
             }
@@ -97,7 +99,7 @@ namespace WpfApplication {
             var playAgain = MessageBox.Show(Application.Current.MainWindow,
                 args.IsVictory ? "Game Victory! Play again?" : "You loser! Play again?", "Game Result",
                 MessageBoxButton.YesNo);
-            if (playAgain == MessageBoxResult.Yes) {
+            if(playAgain == MessageBoxResult.Yes) {
                 StartGame(_currentSettings);
             }
         }

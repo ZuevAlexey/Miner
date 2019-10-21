@@ -1,4 +1,3 @@
-using System;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -6,7 +5,7 @@ using Models;
 using WpfApplication.Views.Events;
 
 namespace WpfApplication.Views {
-    public class MatrixView<T> : FrameworkElement, IMatrixView where T : BaseCellView, new() {
+    public class MatrixView<T>: FrameworkElement, IMatrixView where T: BaseCellView, new() {
         public static readonly DependencyProperty RowsProperty =
             DependencyProperty.Register(
                 nameof(Rows),
@@ -36,7 +35,7 @@ namespace WpfApplication.Views {
                     0,
                     FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange,
                     OnItemHeightChanged));
-        
+
         public static readonly DependencyProperty ItemWidthProperty =
             DependencyProperty.Register(
                 nameof(ItemWidth),
@@ -48,17 +47,17 @@ namespace WpfApplication.Views {
                     OnItemWidthChanged));
 
         private BaseCellView[,] _cells;
-        
+
         public int ItemHeight {
             get => (int) GetValue(ItemHeightProperty);
             set => SetValue(ItemHeightProperty, value);
         }
-        
+
         public int ItemWidth {
             get => (int) GetValue(ItemWidthProperty);
             set => SetValue(ItemWidthProperty, value);
         }
-        
+
         public byte Rows {
             get => (byte) GetValue(RowsProperty);
             set => SetValue(RowsProperty, value);
@@ -81,24 +80,24 @@ namespace WpfApplication.Views {
         }
 
         public void CreateField(byte rows, byte columns) {
-            if (rows == Rows && columns == Columns) {
-                foreach (var cell in _cells) {
+            if(rows == Rows && columns == Columns) {
+                foreach(var cell in _cells) {
                     cell.State = CellState.Closed;
                 }
 
                 return;
             }
 
-            if (_cells != null) {
-                foreach (var button in _cells) {
+            if(_cells != null) {
+                foreach(var button in _cells) {
                     RemoveVisualChild(button);
                 }
             }
 
             _cells = new BaseCellView[rows, columns];
 
-            for (byte row = 0; row < rows; row++) {
-                for (byte col = 0; col < columns; col++) {
+            for(byte row = 0;row < rows;row++) {
+                for(byte col = 0;col < columns;col++) {
                     var cell = new T {
                         Position = new Position(row, col),
                         State = CellState.Closed
@@ -124,25 +123,25 @@ namespace WpfApplication.Views {
         }
 
         private static void OnRowsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
-            if (d is MatrixView<T> matrixView) {
+            if(d is MatrixView<T> matrixView) {
                 matrixView.Rows = (byte) e.NewValue;
             }
         }
 
         private static void OnColumnsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
-            if (d is MatrixView<T> matrixView) {
+            if(d is MatrixView<T> matrixView) {
                 matrixView.Columns = (byte) e.NewValue;
             }
         }
-        
+
         private static void OnItemHeightChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
-            if (d is MatrixView<T> matrixView) {
+            if(d is MatrixView<T> matrixView) {
                 matrixView.ItemHeight = (int) e.NewValue;
             }
         }
-        
+
         private static void OnItemWidthChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
-            if (d is MatrixView<T> matrixView) {
+            if(d is MatrixView<T> matrixView) {
                 matrixView.ItemWidth = (int) e.NewValue;
             }
         }
@@ -160,7 +159,7 @@ namespace WpfApplication.Views {
         }
 
         protected override Size ArrangeOverride(Size arrangeBounds) {
-            if (IsEmpty()) {
+            if(IsEmpty()) {
                 return new Size(0, 0);
             }
 
@@ -169,8 +168,8 @@ namespace WpfApplication.Views {
             var itemWidth = result.Width / Columns;
             var itemHeight = result.Height / Rows;
 
-            for (byte row = 0; row < Rows; row++) {
-                for (byte col = 0; col < Columns; col++) {
+            for(byte row = 0;row < Rows;row++) {
+                for(byte col = 0;col < Columns;col++) {
                     var rect = new Rect(col * itemWidth, row * itemHeight, itemWidth, itemHeight);
                     _cells[row, col].Arrange(rect);
                 }

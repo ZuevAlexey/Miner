@@ -5,7 +5,7 @@ using System.Windows.Media;
 using Models;
 
 namespace WpfApplication.Views {
-    public class DebugCellView : BaseCellView {
+    public class DebugCellView: BaseCellView {
         private static readonly Brush _defaultBrush = Brushes.Cornsilk;
 
         private Brush _brush = _defaultBrush;
@@ -30,13 +30,13 @@ namespace WpfApplication.Views {
         }
 
         protected override void OnStateChangedInternal() {
-            switch (State) {
+            switch(State) {
                 case CellState.Closed:
                     _content = "";
                     _brush = _defaultBrush;
                     break;
                 case CellState.Opened:
-                    if (IsMineHere) {
+                    if(IsMineHere) {
                         _brush = Brushes.Black;
                         break;
                     }

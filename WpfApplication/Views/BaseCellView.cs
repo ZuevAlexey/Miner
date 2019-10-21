@@ -2,7 +2,7 @@ using System.Windows;
 using Models;
 
 namespace WpfApplication.Views {
-    public abstract class BaseCellView : FrameworkElement {
+    public abstract class BaseCellView: FrameworkElement {
         public static readonly DependencyProperty StateProperty =
             DependencyProperty.Register(
                 nameof(State),
@@ -17,7 +17,7 @@ namespace WpfApplication.Views {
         public Position Position { get; set; }
         public bool IsMineHere { get; set; }
         public byte MinesAroundCount { get; set; }
-        
+
         public CellState State {
             get => (CellState) GetValue(StateProperty);
             set => SetValue(StateProperty, value);
@@ -25,7 +25,7 @@ namespace WpfApplication.Views {
 
         private static void OnStateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
             var cell = d as BaseCellView;
-            if (cell != null) {
+            if(cell != null) {
                 cell.State = (CellState) e.NewValue;
                 cell.OnStateChangedInternal();
             }

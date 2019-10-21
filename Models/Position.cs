@@ -1,11 +1,26 @@
 namespace Models {
+    /// <summary>
+    ///     Позиция ячейки
+    /// </summary>
     public class Position {
+        /// <summary>
+        ///     Конструктор
+        /// </summary>
+        /// <param name="row">Строка</param>
+        /// <param name="column">Столбец</param>
         public Position(byte row, byte column) {
             Row = row;
             Column = column;
         }
 
+        /// <summary>
+        ///     Строка
+        /// </summary>
         public byte Row { get; }
+
+        /// <summary>
+        ///     Столбец
+        /// </summary>
         public byte Column { get; }
 
         protected bool Equals(Position other) {
@@ -13,15 +28,15 @@ namespace Models {
         }
 
         public override bool Equals(object obj) {
-            if (ReferenceEquals(null, obj)) {
+            if(ReferenceEquals(null, obj)) {
                 return false;
             }
 
-            if (ReferenceEquals(this, obj)) {
+            if(ReferenceEquals(this, obj)) {
                 return true;
             }
 
-            if (obj.GetType() != GetType()) {
+            if(obj.GetType() != GetType()) {
                 return false;
             }
 

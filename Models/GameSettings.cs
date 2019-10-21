@@ -1,5 +1,15 @@
 namespace Models {
+    /// <summary>
+    ///     Настройки игры
+    /// </summary>
     public class GameSettings {
+        /// <summary>
+        ///     Конструктор
+        /// </summary>
+        /// <param name="rows">Количетсво строк</param>
+        /// <param name="columns">Количество столбцов</param>
+        /// <param name="minesCount">Количетсов мин</param>
+        /// <param name="canOpenMineFirstTry">Можно ли открыть мину с первого раза?</param>
         public GameSettings(byte rows, byte columns, int minesCount, bool canOpenMineFirstTry) {
             Rows = rows;
             Columns = columns;
@@ -7,9 +17,24 @@ namespace Models {
             CanOpenMineFirstTry = canOpenMineFirstTry;
         }
 
-        public byte Rows { get; set; }
-        public byte Columns { get; set; }
-        public int MinesCount { get; set; }
-        public bool CanOpenMineFirstTry { get; set; }
+        /// <summary>
+        ///     Количетсво строк
+        /// </summary>
+        public byte Rows { get; }
+
+        /// <summary>
+        ///     Количество столбцов
+        /// </summary>
+        public byte Columns { get; }
+
+        /// <summary>
+        ///     Количетсов мин
+        /// </summary>
+        public int MinesCount { get; }
+
+        /// <summary>
+        ///     Можно ли открыть мину с первого раза?
+        /// </summary>
+        public bool CanOpenMineFirstTry { get; }
     }
 }

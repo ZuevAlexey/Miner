@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 using Models;
 using WpfApplication.Settings;
 using WpfApplication.Views;
@@ -11,7 +10,7 @@ namespace WpfApplication {
     public partial class MainWindow {
         private readonly Presenter _presenter;
         private readonly SettingsStorage _settingsStorage;
-        
+
         public MainWindow() {
             InitializeComponent();
             var mainWindowView = new DebugTitleView();

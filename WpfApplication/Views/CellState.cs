@@ -1,5 +1,5 @@
 namespace Models {
-    public enum CellState : byte {
+    public enum CellState: byte {
         /// <summary>
         ///     The cell is closed. User hasn’t done anything with her yet.
         /// </summary>

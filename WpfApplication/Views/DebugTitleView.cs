@@ -4,7 +4,7 @@ using System.Timers;
 using System.Windows;
 
 namespace WpfApplication.Views {
-    public class DebugTitleView : IMinesCountView, ITimerView {
+    public class DebugTitleView: IMinesCountView, ITimerView {
         private readonly Stopwatch _stopwatch;
         private readonly Timer _timer;
         private int _minesCount;

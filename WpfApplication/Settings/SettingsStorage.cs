@@ -18,6 +18,10 @@ namespace WpfApplication.Settings {
 
         public Action OnComplexityChanged;
 
+        private SettingsStorage(Dictionary<Complexity, GameSettings> gameSettings) {
+            _gameSettings = gameSettings;
+        }
+
         public Complexity Complexity {
             set {
                 if(_complexity == value) {
@@ -33,16 +37,12 @@ namespace WpfApplication.Settings {
             new GameSettings(_gameSettings[_complexity].Rows, _gameSettings[_complexity].Columns,
                 _gameSettings[_complexity].MinesCount, _gameSettings[_complexity].CanOpenMineFirstTry);
 
-        private SettingsStorage(Dictionary<Complexity, GameSettings> gameSettings) {
-            _gameSettings = gameSettings;
-        }
-        
         public static SettingsStorage Load() {
-           var gameSettings = new Dictionary<Complexity, GameSettings>();
+            var gameSettings = new Dictionary<Complexity, GameSettings>();
             foreach(var pair in _complexityConfigKeys) {
                 gameSettings[pair.Key] = ParseGameSettings(pair.Value);
             }
-            
+
             return new SettingsStorage(gameSettings);
         }
 

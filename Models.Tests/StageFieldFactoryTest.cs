@@ -11,10 +11,10 @@ namespace Models.Test {
             get {
                 var factory = new StageFieldFactory(new SimpleMiningAlgorithm());
 
-                for (byte row = 5; row < 10; row++) {
-                    for (byte col = 5; col < 10; col++) {
+                for(byte row = 5;row < 10;row++) {
+                    for(byte col = 5;col < 10;col++) {
                         var step = Math.Min(row, col);
-                        for (var mineCount = 0; mineCount <= row * col; mineCount += step) {
+                        for(var mineCount = 0;mineCount <= row * col;mineCount += step) {
                             yield return
                                 new TestCaseData(new GameSettings(row, col, mineCount, false), factory).SetName(
                                     $"row = {row}; col = {col}; mineCount = {mineCount}");
