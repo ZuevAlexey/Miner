@@ -44,6 +44,7 @@ namespace WpfApplication {
         }
 
         public async Task StartGame(GameSettings settings) {
+            _timerView.Reset();
             _currentSettings = settings;
             await Task.Run(() => _gameManager.StartGame(settings));
             _matrixView.CreateField(settings.Rows, settings.Columns);

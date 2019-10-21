@@ -34,6 +34,13 @@ namespace WpfApplication.Views {
             _stopwatch.Stop();
         }
 
+        /// <inheritdoc/>
+        public void Reset() {
+            _timer.Stop();
+            _stopwatch.Reset();
+            Show();
+        }
+
         private void Show() {
             var newTitle = $"Mines count = {_minesCount}; Time elapsed = {(int) _stopwatch.Elapsed.TotalSeconds}";
             Application.Current.Dispatcher.Invoke(() => { Application.Current.MainWindow.Title = newTitle; });
