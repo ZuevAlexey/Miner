@@ -5,8 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:wpfApplication="clr-namespace:WpfApplication"
         xmlns:wpfApplicationSettings="clr-namespace:WpfApplication.Settings"
+        Icon="Content/icon.jpg"
         mc:Ignorable="d"
-        Title="MainWindow" SizeToContent="WidthAndHeight">
+        Title="MainWindow" SizeToContent="WidthAndHeight" ResizeMode="CanMinimize">
     <Window.CommandBindings>
         <CommandBinding Command="wpfApplication:Commands.StartNewGame" Executed="StartNewGame_Executed"/>
         <CommandBinding Command="wpfApplication:Commands.ChangeComplexity" Executed="ChangeComplexity_Executed"/>
