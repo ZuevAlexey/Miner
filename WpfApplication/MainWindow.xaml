@@ -30,6 +30,6 @@
             </MenuItem>
 
         </Menu>
-        <wpfApplication:MatrixViewWrapper x:Name="Field" ItemWidth="50" ItemHeight="50" />
+        <wpfApplication:DebugMatrixView x:Name="Field" CellWidth="50" CellHeight="50" />
     </DockPanel>
 </Window>

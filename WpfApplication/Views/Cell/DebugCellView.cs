@@ -2,9 +2,11 @@ using System;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Media;
-using Models;
 
-namespace WpfApplication.Views {
+namespace WpfApplication.Views.Cell {
+    /// <summary>
+    /// Простое отображение ячейки. Подойдет для ручного тестирования логики игры и логики интерфейса
+    /// </summary>
     public class DebugCellView: BaseCellView {
         private static readonly Brush _defaultBrush = Brushes.Cornsilk;
 
@@ -30,23 +32,23 @@ namespace WpfApplication.Views {
         }
 
         protected override void OnStateChangedInternal() {
-            switch(State) {
+            switch(StateData.State) {
                 case CellState.Closed:
                     _content = "";
                     _brush = _defaultBrush;
                     break;
                 case CellState.Opened:
-                    if(IsMineHere) {
+                    if(StateData.IsMineHere == true) {
                         _brush = Brushes.Black;
                         break;
                     }
 
-                    _brush = MinesAroundCount == 0
+                    _brush = StateData.MinesAroundCount == 0
                         ? Brushes.Green
                         : Brushes.Brown;
-                    _content = MinesAroundCount == 0
+                    _content = StateData.MinesAroundCount == 0
                         ? ""
-                        : MinesAroundCount.ToString();
+                        : StateData.MinesAroundCount.ToString();
                     break;
                 case CellState.MineHere:
                     _content = "!";

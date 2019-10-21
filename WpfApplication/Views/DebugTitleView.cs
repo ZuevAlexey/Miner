@@ -4,6 +4,9 @@ using System.Timers;
 using System.Windows;
 
 namespace WpfApplication.Views {
+    /// <summary>
+    /// Простое отображение таймера и счетчика бомб в заголовке главного окна. Подойдет для ручного тестирования логики игры и логики интерфейса
+    /// </summary>
     public class DebugTitleView: IMinesCountView, ITimerView {
         private readonly Stopwatch _stopwatch;
         private readonly Timer _timer;
@@ -16,6 +19,7 @@ namespace WpfApplication.Views {
             _stopwatch = new Stopwatch();
         }
 
+        /// <inheritdoc/>
         public int MinesCount {
             get => _minesCount;
             set {
@@ -24,14 +28,17 @@ namespace WpfApplication.Views {
             }
         }
 
+        /// <inheritdoc/>
         public void Start() {
             _timer.Start();
             _stopwatch.Restart();
         }
 
+        /// <inheritdoc/>
         public void Stop() {
             _timer.Stop();
             _stopwatch.Stop();
+            Show();
         }
 
         /// <inheritdoc/>

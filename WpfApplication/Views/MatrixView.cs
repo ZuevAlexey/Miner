@@ -2,7 +2,8 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using Models;
-using WpfApplication.Views.Events;
+using WpfApplication.Views.Cell;
+using WpfApplication.Views.Cell.Events;
 
 namespace WpfApplication.Views {
     public class MatrixView<T>: FrameworkElement, IMatrixView where T: BaseCellView, new() {
@@ -26,63 +27,76 @@ namespace WpfApplication.Views {
                     FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange,
                     OnColumnsChanged));
 
-        public static readonly DependencyProperty ItemHeightProperty =
+        public static readonly DependencyProperty CellHeightProperty =
             DependencyProperty.Register(
-                nameof(ItemHeight),
+                nameof(CellHeight),
                 typeof(int),
                 typeof(MatrixView<T>),
                 new FrameworkPropertyMetadata(
                     0,
                     FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange,
-                    OnItemHeightChanged));
+                    OnCellHeightChanged));
 
-        public static readonly DependencyProperty ItemWidthProperty =
+        public static readonly DependencyProperty CellWidthProperty =
             DependencyProperty.Register(
-                nameof(ItemWidth),
+                nameof(CellWidth),
                 typeof(int),
                 typeof(MatrixView<T>),
                 new FrameworkPropertyMetadata(
                     0,
                     FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange,
-                    OnItemWidthChanged));
+                    OnCellWidthChanged));
 
         private BaseCellView[,] _cells;
 
-        public int ItemHeight {
-            get => (int) GetValue(ItemHeightProperty);
-            set => SetValue(ItemHeightProperty, value);
+        /// <summary>
+        /// Высота ячейки
+        /// </summary>
+        public int CellHeight {
+            get => (int) GetValue(CellHeightProperty);
+            set => SetValue(CellHeightProperty, value);
         }
 
-        public int ItemWidth {
-            get => (int) GetValue(ItemWidthProperty);
-            set => SetValue(ItemWidthProperty, value);
+        /// <summary>
+        /// Ширина ячейки
+        /// </summary>
+        public int CellWidth {
+            get => (int) GetValue(CellWidthProperty);
+            set => SetValue(CellWidthProperty, value);
         }
 
-        public byte Rows {
+        /// <summary>
+        /// Количество строк
+        /// </summary>
+        private byte Rows {
             get => (byte) GetValue(RowsProperty);
             set => SetValue(RowsProperty, value);
         }
 
-        public byte Columns {
+        /// <summary>
+        /// Количество столбцов
+        /// </summary>
+        private byte Columns {
             get => (byte) GetValue(ColumnsProperty);
             set => SetValue(ColumnsProperty, value);
         }
 
         protected override int VisualChildrenCount => _cells?.Length ?? 0;
 
+        /// <inheritdoc />
         public event OnCellPressedEventHandler OnCellPressed;
 
-        public void ChangeCellState(Position position, CellState newState, bool isMineHere, byte minesAroundCount) {
+        /// <inheritdoc />
+        public void ChangeCellState(Position position, CellData newState) {
             var cell = _cells[position.Row, position.Column];
-            cell.MinesAroundCount = minesAroundCount;
-            cell.IsMineHere = isMineHere;
-            cell.State = newState;
+            cell.StateData = newState;
         }
 
+        /// <inheritdoc />
         public void CreateField(byte rows, byte columns) {
             if(rows == Rows && columns == Columns) {
                 foreach(var cell in _cells) {
-                    cell.State = CellState.Closed;
+                    cell.StateData = new CellData(CellState.Closed);
                 }
 
                 return;
@@ -100,7 +114,7 @@ namespace WpfApplication.Views {
                 for(byte col = 0;col < columns;col++) {
                     var cell = new T {
                         Position = new Position(row, col),
-                        State = CellState.Closed
+                        StateData = new CellData(CellState.Closed)
                     };
 
                     cell.PreviewMouseDown += CellPreviewMouseDownEventHandler;
@@ -113,13 +127,15 @@ namespace WpfApplication.Views {
             Columns = columns;
         }
 
+        /// <inheritdoc />
         public CellState GetCellState(Position position) {
-            return _cells[position.Row, position.Column].State;
+            return _cells[position.Row, position.Column].StateData.State;
         }
 
         private void CellPreviewMouseDownEventHandler(object sender, MouseButtonEventArgs args) {
-            var cell = sender as T;
-            OnCellPressed?.Invoke(this, new OnCellPressedEventHandlerArgs(cell.Position, args.ChangedButton));
+            if(sender is T cell) {
+                OnCellPressed?.Invoke(this, new OnCellPressedEventHandlerArgs(cell.Position, args.ChangedButton));
+            }
         }
 
         private static void OnRowsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
@@ -134,15 +150,15 @@ namespace WpfApplication.Views {
             }
         }
 
-        private static void OnItemHeightChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+        private static void OnCellHeightChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
             if(d is MatrixView<T> matrixView) {
-                matrixView.ItemHeight = (int) e.NewValue;
+                matrixView.CellHeight = (int) e.NewValue;
             }
         }
 
-        private static void OnItemWidthChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+        private static void OnCellWidthChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
             if(d is MatrixView<T> matrixView) {
-                matrixView.ItemWidth = (int) e.NewValue;
+                matrixView.CellWidth = (int) e.NewValue;
             }
         }
 
@@ -155,7 +171,7 @@ namespace WpfApplication.Views {
         }
 
         private Size GetSize() {
-            return new Size(ItemWidth * Columns, ItemHeight * Rows);
+            return new Size(CellWidth * Columns, CellHeight * Rows);
         }
 
         protected override Size ArrangeOverride(Size arrangeBounds) {

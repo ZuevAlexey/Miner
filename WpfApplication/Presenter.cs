@@ -6,7 +6,8 @@ using System.Windows.Input;
 using Models;
 using Models.Events;
 using WpfApplication.Views;
-using WpfApplication.Views.Events;
+using WpfApplication.Views.Cell;
+using WpfApplication.Views.Cell.Events;
 
 namespace WpfApplication {
     public class Presenter {
@@ -71,7 +72,7 @@ namespace WpfApplication {
                 return;
             }
 
-            _matrixView.ChangeCellState(position, nextState, false, 0);
+            _matrixView.ChangeCellState(position, new CellData(nextState, false, 0));
 
             if(curState == CellState.MineHere) {
                 _minesCountView.MinesCount++;
@@ -93,7 +94,7 @@ namespace WpfApplication {
             _timerView.Stop();
             if(args.MinePositions != null) {
                 foreach(var position in args.MinePositions) {
-                    _matrixView.ChangeCellState(position, CellState.Opened, true, 0);
+                    _matrixView.ChangeCellState(position, new CellData(CellState.Opened, true, 0));
                 }
             }
 
@@ -106,7 +107,7 @@ namespace WpfApplication {
         }
 
         private void GameManagerCellOpenedEventHandler(object sender, CellOpenedEventHandlerArgs args) {
-            _matrixView.ChangeCellState(args.Position, CellState.Opened, args.IsMineHere, args.MinesAroundCount);
+            _matrixView.ChangeCellState(args.Position, new CellData(CellState.Opened, args.IsMineHere, args.MinesAroundCount));
         }
     }
 }

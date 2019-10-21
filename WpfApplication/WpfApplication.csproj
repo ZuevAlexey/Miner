@@ -52,15 +52,16 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Commands.cs" />
-    <Compile Include="MatrixViewWrapper.cs" />
+    <Compile Include="DebugMatrixView.cs" />
     <Compile Include="Settings\Complexity.cs" />
     <Compile Include="Settings\SettingsStorage.cs" />
-    <Compile Include="Views\BaseCellView.cs" />
-    <Compile Include="Views\CellState.cs" />
-    <Compile Include="Views\DebugCellView.cs" />
+    <Compile Include="Views\Cell\BaseCellView.cs" />
+    <Compile Include="Views\Cell\CellData.cs" />
+    <Compile Include="Views\Cell\CellState.cs" />
+    <Compile Include="Views\Cell\DebugCellView.cs" />
+    <Compile Include="Views\Cell\Events\OnCellPressedEventHandler.cs" />
+    <Compile Include="Views\Cell\Events\OnCellPressedEventHandlerArgs.cs" />
     <Compile Include="Views\DebugTitleView.cs" />
-    <Compile Include="Views\Events\OnCellPressedEventHandler.cs" />
-    <Compile Include="Views\Events\OnCellPressedEventHandlerArgs.cs" />
     <Compile Include="Views\IMatrixView.cs" />
     <Compile Include="Views\IMinesCountView.cs" />
     <Compile Include="Views\ITimerView.cs" />
