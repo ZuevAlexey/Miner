@@ -7,7 +7,6 @@ using WpfApplication.Views.Events;
 
 namespace WpfApplication.Views {
     public class MatrixView<T> : FrameworkElement, IMatrixView where T : BaseCellView, new() {
-        /// <summary>Rows Dependency Property</summary>
         public static readonly DependencyProperty RowsProperty =
             DependencyProperty.Register(
                 nameof(Rows),
@@ -18,7 +17,6 @@ namespace WpfApplication.Views {
                     FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange,
                     OnRowsChanged));
 
-        /// <summary>Rows Dependency Property</summary>
         public static readonly DependencyProperty ColumnsProperty =
             DependencyProperty.Register(
                 nameof(Columns),
@@ -29,19 +27,43 @@ namespace WpfApplication.Views {
                     FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange,
                     OnColumnsChanged));
 
-        private BaseCellView[,] _cells;
+        public static readonly DependencyProperty ItemHeightProperty =
+            DependencyProperty.Register(
+                nameof(ItemHeight),
+                typeof(int),
+                typeof(MatrixView<T>),
+                new FrameworkPropertyMetadata(
+                    0,
+                    FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange,
+                    OnItemHeightChanged));
+        
+        public static readonly DependencyProperty ItemWidthProperty =
+            DependencyProperty.Register(
+                nameof(ItemWidth),
+                typeof(int),
+                typeof(MatrixView<T>),
+                new FrameworkPropertyMetadata(
+                    0,
+                    FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange,
+                    OnItemWidthChanged));
 
-        /// <summary>
-        ///     Style property
-        /// </summary>
+        private BaseCellView[,] _cells;
+        
+        public int ItemHeight {
+            get => (int) GetValue(ItemHeightProperty);
+            set => SetValue(ItemHeightProperty, value);
+        }
+        
+        public int ItemWidth {
+            get => (int) GetValue(ItemWidthProperty);
+            set => SetValue(ItemWidthProperty, value);
+        }
+        
         public byte Rows {
             get => (byte) GetValue(RowsProperty);
             set => SetValue(RowsProperty, value);
         }
 
-        /// <summary>
-        ///     Style property
-        /// </summary>
         public byte Columns {
             get => (byte) GetValue(ColumnsProperty);
             set => SetValue(ColumnsProperty, value);
@@ -112,17 +134,29 @@ namespace WpfApplication.Views {
                 matrixView.Columns = (byte) e.NewValue;
             }
         }
+        
+        private static void OnItemHeightChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            if (d is MatrixView<T> matrixView) {
+                matrixView.ItemHeight = (int) e.NewValue;
+            }
+        }
+        
+        private static void OnItemWidthChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            if (d is MatrixView<T> matrixView) {
+                matrixView.ItemWidth = (int) e.NewValue;
+            }
+        }
 
         protected override Visual GetVisualChild(int index) {
             return _cells[index / Columns, index % Columns];
         }
 
         protected override Size MeasureOverride(Size constraint) {
-            if (constraint.Width < 50 || constraint.Height < 50) {
-                return new Size(50, 50);
-            }
+            return GetSize();
+        }
 
-            return constraint;
+        private Size GetSize() {
+            return new Size(ItemWidth * Columns, ItemHeight * Rows);
         }
 
         protected override Size ArrangeOverride(Size arrangeBounds) {
@@ -130,7 +164,7 @@ namespace WpfApplication.Views {
                 return new Size(0, 0);
             }
 
-            var result = new Size(Math.Max(500, arrangeBounds.Width), Math.Max(500, arrangeBounds.Height));
+            var result = GetSize();
 
             var itemWidth = result.Width / Columns;
             var itemHeight = result.Height / Rows;

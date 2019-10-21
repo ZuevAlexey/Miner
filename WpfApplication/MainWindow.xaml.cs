@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics;
+using System.Windows.Input;
 using Models;
+using WpfApplication.Settings;
 using WpfApplication.Views;
 
 namespace WpfApplication {
@@ -8,18 +10,29 @@ namespace WpfApplication {
     /// </summary>
     public partial class MainWindow {
         private readonly Presenter _presenter;
-
+        private readonly SettingsStorage _settingsStorage;
+        
         public MainWindow() {
             InitializeComponent();
             var mainWindowView = new DebugTitleView();
             var gameManager = new GameManager(new StageFieldFactory(new SimpleMiningAlgorithm()));
-            gameManager.OnCellOpened += (sender, args) => Debug.WriteLine($"OnCellOpened {args}");
-            gameManager.OnGameFinished += (sender, args) => Debug.WriteLine($"GameFinished {args.IsVictory}");
-            gameManager.OnGameStarted += (sender, args) => Debug.WriteLine("Game Started");
-
+            _settingsStorage = SettingsStorage.Load();
+            _settingsStorage.OnComplexityChanged += StartGame;
 
             _presenter = new Presenter(Field, gameManager, mainWindowView, mainWindowView);
-            _presenter.StartGame(new GameSettings(9, 9, 10, false));
+            StartGame();
+        }
+
+        private void StartGame() {
+            _presenter.StartGame(_settingsStorage.Current);
+        }
+
+        private void StartNewGame_Executed(object sender, ExecutedRoutedEventArgs e) {
+            StartGame();
+        }
+
+        private void ChangeComplexity_Executed(object sender, ExecutedRoutedEventArgs e) {
+            _settingsStorage.Complexity = (Complexity) e.Parameter;
         }
     }
 }

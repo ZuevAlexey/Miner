@@ -17,7 +17,7 @@ namespace WpfApplication.Views {
         public Position Position { get; set; }
         public bool IsMineHere { get; set; }
         public byte MinesAroundCount { get; set; }
-
+        
         public CellState State {
             get => (CellState) GetValue(StateProperty);
             set => SetValue(StateProperty, value);

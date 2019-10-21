@@ -21,7 +21,7 @@ namespace WpfApplication.Views {
                 CultureInfo.CurrentCulture,
                 FlowDirection.LeftToRight,
                 new Typeface("Times new roman"),
-                21,
+                Math.Pow(Math.Pow(ActualWidth, 2) + Math.Pow(ActualHeight, 2), 0.5) * 0.4,
                 Brushes.Black, VisualTreeHelper.GetDpi(this).PixelsPerDip);
 
             var textLocation = new Point(ActualWidth / 2 - formattedText.WidthIncludingTrailingWhitespace / 2,
